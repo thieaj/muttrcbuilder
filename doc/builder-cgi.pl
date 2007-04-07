@@ -95,7 +95,8 @@ sub welcome {
 
 	print $c->start_Select({ -name => "version" });
 
-	print $c->option("mutt-".$_) foreach Mutt::Config->get_versions();
+	print $c->option("mutt-".$_) foreach (sort
+		Mutt::Config->get_versions());
 
 	print $c->end_Select();
 

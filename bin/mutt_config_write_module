@@ -1,3 +1,73 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Mutt::Config;
+use XML::LibXML;
+use XML::LibXSLT;
+
+unless(@ARGV >= 1) {
+	print STDERR <<"END";
+usage: $0 manual.xml manual.txt [ output ]
+END
+	exit(0);
+}
+
+my ($xmlf, $txtf, $opf) = @ARGV;
+
+my $parser = XML::LibXML->new();
+my $xslt = XML::LibXSLT->new();
+my $xml = $parser->parse_file($xmlf) or die("Error reading manual.xml");
+
+my $version_node = ($xml->findnodes("//releaseinfo"))[0];
+my $version = $version_node->toString;
+die("Cannot work out version in $version")
+	unless $version =~ m/version\s+(.*?)\s+/;
+$version = $1;
+
+my $module = $version;
+$module =~ s/[.-]/_/g;
+
+$opf ||= generate_output_name($module);
+
+open(my $op, "> $opf") or die("Error opening output $opf: $!");
+
+print $op "package Mutt::Config::Version::v$module;\n\n";
+
+my $style_doc = $parser->parse_string(join("",<DATA>));
+my $stylesheet = $xslt->parse_stylesheet($style_doc);
+
+my $results = $stylesheet->transform($xml);
+
+print $op $stylesheet->output_string($results);
+
+print $op "\n\n__DATA__\n";
+
+open(my $lh, "-|", "lynx", "-dump", $txtf) or die("Error opening lynx: $!");
+
+my $in_vars = 0;
+
+while(<$lh>) {
+	if (m/^\d+\. /) { $in_vars = 0; }
+	if (m/^\d+\. Configuration variables/) { $in_vars = 1; }
+	elsif ($in_vars and m/^\d+\.\d+\. (.*)/) { print $op "#  $1\n"; }
+	elsif ($in_vars) { print $op "#$_"; }
+}
+
+close($lh) or die("Error closing lynx: $!");
+
+sub generate_output_name {
+	my $module = shift;
+	my $fn = $INC{"Mutt/Config.pm"};
+	$fn =~ s(\.pm$)(/Version/);
+	die("Cannot find module directory $fn") unless(-e $fn and -d $fn);
+	$fn .= "v$module.pm";
+	return $fn;
+}
+
+__DATA__
 <?xml version='1.0'?> 
 <xsl:stylesheet  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0"
                 xmlns:str="http://exslt.org/strings"
@@ -5,9 +75,9 @@
 <xsl:output method="text" />
 
 <xsl:template match="/">
-$VAR1 = {
+$VARIABLES = {
 	<xsl:apply-templates select="//sect1[@id='variables']" />
-}
+};
 </xsl:template>
 
 <xsl:template match="sect1">
