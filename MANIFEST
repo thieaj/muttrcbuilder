@@ -2,5 +2,15 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/muttrcbuilder.t
-lib/muttrcbuilder.pm
+bin/mutt_config_write_module
+doc/builder-cgi.pl
+lib/Mutt/Config.pm
+lib/Mutt/Config/Categories.pm
+lib/Mutt/Config/Option.pm
+lib/Mutt/Config/OptionTypes.pm
+lib/Mutt/Config/Version/v20050909_ng.pm
+lib/Mutt/Config/Version/v1_4_2_1.pm
+lib/Mutt/Config/Version/v1_2_5.pm
+lib/Mutt/Config/Version/v1_5_13.pm
+lib/Mutt/Config/Version/v1_5_9_debiansarge.pm
+lib/Mutt/Config/Version/v1_5_15.pm
