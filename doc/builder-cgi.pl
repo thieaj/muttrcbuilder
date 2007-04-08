@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-use lib "/home/lukeross/subversion/muttrcbuilder/lib";
 
 use strict;
 use warnings;
