@@ -14,3 +14,4 @@ lib/Mutt/Config/Version/v1_2_5.pm
 lib/Mutt/Config/Version/v1_5_13.pm
 lib/Mutt/Config/Version/v1_5_9_debiansarge.pm
 lib/Mutt/Config/Version/v1_5_15.pm
+META.yml                                 Module meta-data (added by MakeMaker)
