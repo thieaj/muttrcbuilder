@@ -1,4 +1,4 @@
-package Mutt::Config::Version::v1_5_15;
+package Mutt::Config::Version::v1_5_18_debianlenny;
 
 
 $VARIABLES = {
@@ -308,8 +308,15 @@ following printf-style sequences are understood:
 <dt><strong>%|X </strong></dt>
 <dd><p>pad to the end of the line with character "X"
 </p></dd>
+<dt><strong>%*X </strong></dt>
+<dd><p>soft-fill with character "X" as pad
+</p></dd>
 </dl>
 
+
+</p>
+<p>
+For an explanation of `soft-fill\', see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#index-format">$index_format</a>\'\' documentation.
 </p>
 '
 },
@@ -450,6 +457,10 @@ and thus not recommended, because you are unable to bounce messages.
 When this variable is set, mutt will include Delivered-To headers when
 bouncing messages.  Postfix users may wish to unset this variable.
 </p>
+<p>
+<em>Note:</em> On Debian systems, this option is unset by default in
+/etc/Muttrc.
+</p>
 '
 },
 
@@ -493,6 +504,7 @@ access time when checking for new mail.
 
 <p>
 Character set your terminal uses to display and enter textual data.
+It is also the fallback for <a href="http://www.mutt.org/doc/manual/manual-6.html#send-charset">$send_charset</a>.
 </p>
 '
 },
@@ -863,10 +875,6 @@ mutt.
 
 
 <p>
-<em>Note:</em> you should not enable this unless you are using Sendmail
-8.8.x or greater.
-</p>
-<p>
 This variable sets the request for when notification is returned.  The
 string consists of a comma separated list (no spaces!) of one or more
 of the following: <em>never</em>, to never request notification,
@@ -876,6 +884,13 @@ notified of successful transmission.
 </p>
 <p>
 Example: set dsn_notify="failure,delay"
+</p>
+<p>
+<em>Note:</em> when using <a href="http://www.mutt.org/doc/manual/manual-6.html#sendmail">$sendmail</a> for delivery, you should not enable
+this unless you are either using Sendmail 8.8.x or greater or a MTA
+providing a sendmail(1)-compatible interface supporting the -N option
+for DSN. For SMTP delivery, it depends on the server whether DSN is
+supported or not.
 </p>
 '
 },
@@ -888,16 +903,19 @@ Example: set dsn_notify="failure,delay"
 
 
 <p>
-<em>Note:</em> you should not enable this unless you are using Sendmail
-8.8.x or greater.
-</p>
-<p>
 This variable controls how much of your message is returned in DSN
 messages.  It may be set to either <em>hdrs</em> to return just the
 message header, or <em>full</em> to return the full message.
 </p>
 <p>
 Example: set dsn_return=hdrs
+</p>
+<p>
+<em>Note:</em> when using <a href="http://www.mutt.org/doc/manual/manual-6.html#sendmail">$sendmail</a> for delivery, you should not enable
+this unless you are either using Sendmail 8.8.x or greater or a MTA
+providing a sendmail(1)-compatible interface supporting the -R option
+for DSN. For SMTP delivery, it depends on the server whether DSN is
+supported or not.
 </p>
 '
 },
@@ -929,6 +947,10 @@ in the thread diagram.
 This option allows you to edit the header of your outgoing messages
 along with the body of your message.
 </p>
+<p>
+<em>Note</em> that changes made to the References: and Date: headers are
+ignored for interoperability reasons.
+</p>
 '
 },
 
@@ -942,7 +964,7 @@ along with the body of your message.
 <p>
 This variable specifies which editor is used by mutt.
 It defaults to the value of the VISUAL, or EDITOR, environment
-variable, or to the string "vi" if neither of those are set.
+variable, or to the string "/usr/bin/editor" if neither of those are set.
 </p>
 '
 },
@@ -1110,8 +1132,15 @@ its own set of printf()-like sequences:
 <dt><strong>%|X </strong></dt>
 <dd><p>pad to the end of the line with character "X"
 </p></dd>
+<dt><strong>%*X </strong></dt>
+<dd><p>soft-fill with character "X" as pad
+</p></dd>
 </dl>
 
+
+</p>
+<p>
+For an explanation of `soft-fill\', see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#index-format">$index_format</a>\'\' documentation.
 </p>
 '
 },
@@ -1456,9 +1485,26 @@ honored when group-replying to a message.
 
 
 <p>
-Specifies the hostname to use after the ``@\'\' in local e-mail
-addresses.  This overrides the compile time definition obtained from
-/etc/resolv.conf.
+Specifies the fully-qualified hostname of the system mutt is running on
+containing the host\'s name and the DNS domain it belongs to. It is used
+as the domain part (after ``@\'\') for local email addresses as well as
+Message-Id headers.
+</p>
+<p>
+Its value is determined at startup as follows: If the node\'s name
+as returned by the uname(3) function contains the hostname and the
+domain, these are used to construct <a href="http://www.mutt.org/doc/manual/manual-6.html#hostname">$hostname</a>. If there is no
+domain part returned, Mutt will look for a ``domain\'\' or ``search\'\'
+line in /etc/resolv.conf to determine the domain. Optionally, Mutt
+can be compiled with a fixed domain name in which case a detected
+one is not used.
+</p>
+<p>
+Also see ``<a href="http://www.mutt.org/doc/manual/manual-6.html#use-domain">$use_domain</a>\'\' and ``<a href="http://www.mutt.org/doc/manual/manual-6.html#hidden-host">$hidden_host</a>\'\'.
+</p>
+<p>
+<em>Note:</em> On Debian systems, the default for this variable is obtained
+from /etc/mailname when Mutt starts.
 </p>
 '
 },
@@ -1487,7 +1533,8 @@ and *text to a single space to prevent the display of MIME-encoded
 
 <p>
 Affects the behaviour of the <em>reply</em> function when replying to
-messages from mailing lists.  When set, if the ``Reply-To:\'\' field is
+messages from mailing lists (as defined by the ``subscribe\'\' or
+``<a href="http://www.mutt.org/doc/manual/manual-6.html#lists">lists</a>\'\' commands).  When set, if the ``Reply-To:\'\' field is
 set to the same value as the ``To:\'\' field, Mutt assumes that the
 ``Reply-To:\'\' field was set by the mailing list to automate responses
 to the list, and will ignore this field.  To direct a response to the
@@ -1780,6 +1827,10 @@ Specifies the string to prepend to each line of text quoted in a
 message to which you are replying.  You are strongly encouraged not to
 change this value, as it tends to agitate the more fanatical netizens.
 </p>
+<p>
+This option is a format string, please see the description of
+``<a href="http://www.mutt.org/doc/manual/manual-6.html#index-format">$index_format</a>\'\' for supported printf()-style sequences.
+</p>
 '
 },
 
@@ -1837,7 +1888,7 @@ The following sequences are defined in Mutt:
 <dd><p>number of messages in current thread
 </p></dd>
 <dt><strong>%f </strong></dt>
-<dd><p>entire From: line (address + real name)
+<dd><p>sender (address + real name), either From: or Return-Path:
 </p></dd>
 <dt><strong>%F </strong></dt>
 <dd><p>author name, or recipient name if the message is from you
@@ -1872,6 +1923,9 @@ defined by the users ``subscribe\'\' command, this displays
 <dt><strong>%O </strong></dt>
 <dd><p>(_O_riginal save folder)  Where mutt would formerly have
 stashed the message: list name or recipient name if no list
+</p></dd>
+<dt><strong>%P </strong></dt>
+<dd><p>progress indicator for the builtin pager (how much of the file has been displayed)
 </p></dd>
 <dt><strong>%s </strong></dt>
 <dd><p>subject of the message
@@ -1931,9 +1985,25 @@ function ``strftime\'\'; a leading bang disables locales.
 <dt><strong>%|X    </strong></dt>
 <dd><p>pad to the end of the line with character "X"
 </p></dd>
+<dt><strong>%*X    </strong></dt>
+<dd><p>soft-fill with character "X" as pad
+</p></dd>
 </dl>
 
 
+</p>
+<p>
+`Soft-fill\' deserves some explanation. Normal right-justification
+will print everything to the left of the %>, displaying padding and
+the whatever lies to the right only if there\'s room. By contrast,
+soft-fill gives priority to the right-hand side, guaranteeing space
+to display it and showing padding only if there\'s still room. If
+necessary, soft-fill will eat text leftwards to make room for
+rightward text.
+</p>
+<p>
+Note that these expandos are supported in 
+``<a href="http://www.mutt.org/doc/manual/manual-6.html#save-hook">save-hook</a>\'\', ``<a href="http://www.mutt.org/doc/manual/manual-6.html#fcc-hook">fcc-hook</a>\'\' and ``<a href="http://www.mutt.org/doc/manual/manual-6.html#fcc-save-hook">fcc-save-hook</a>\'\', too.
 </p>
 <p>
 See also: ``<a href="http://www.mutt.org/doc/manual/manual-6.html#to-chars">$to_chars</a>\'\'.
@@ -1992,7 +2062,7 @@ the strings your system accepts for the locale variable <em>LC_TIME</em>.
 
 <p>
 This variable configures how often (in seconds) mutt should look for
-new mail.
+new mail. Also see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#timeout">$timeout</a>\'\' variable.
 </p>
 '
 },
@@ -2026,6 +2096,23 @@ but we are not sure it doesn\'t break some more advanced MIME stuff.
 <p>
 <em>DON\'T CHANGE THIS SETTING UNLESS YOU ARE REALLY SURE WHAT YOU ARE
 DOING!</em>
+</p>
+'
+},
+
+'maildir_mtime' => {
+'default' => 'no',
+'type' => 'boolean',
+'text' => '
+
+
+
+<p>
+If set, the sort-by-date option in the browser will sort maildirs
+smartly, not using the mtime of the maildir itself but that of the
+newest message in the new subdirectory, making the sorting by
+reverse date much more useful. People with maildirs over NFS may
+wish to leave this option unset.
 </p>
 '
 },
@@ -2074,23 +2161,6 @@ When mutt is compiled with either gdbm or bdb4 as the header cache backend,
 this option changes the database page size.  Too large or too small
 values can waste space, memory, or CPU time. The default should be more
 or less optimal for most use cases.
-</p>
-'
-},
-
-'header_cache_compress' => {
-'default' => 'no',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-When mutt is compiled with qdbm as header cache backend,
-this option determines whether the database will be compressed.
-Compression results in database files roughly being one fifth
-of the usual diskspace, but the uncompression can result in a
-slower opening of cached folder(s).
 </p>
 '
 },
@@ -2370,53 +2440,30 @@ be attached to the newly composed message if this option is set.
 '
 },
 
-'mix_entry_format' => {
-'default' => '%4n %c %-16s %a',
+'pgp_mime_signature_filename' => {
+'default' => 'signature.asc',
 'type' => 'string',
 'text' => '
 
 
 
 <p>
-This variable describes the format of a remailer line on the mixmaster
-chain selection screen.  The following printf-like sequences are 
-supported:
-</p>
-<p>
-
-
-<dl>
-
-<dt><strong>%n </strong></dt>
-<dd><p>The running number on the menu.
-</p></dd>
-<dt><strong>%c </strong></dt>
-<dd><p>Remailer capabilities.
-</p></dd>
-<dt><strong>%s </strong></dt>
-<dd><p>The remailer\'s short name.
-</p></dd>
-<dt><strong>%a </strong></dt>
-<dd><p>The remailer\'s e-mail address.
-</p></dd>
-</dl>
-
+This option sets the filename used for signature parts in PGP/MIME
+signed messages.
 </p>
 '
 },
 
-'mixmaster' => {
-'default' => 'mixmaster',
-'type' => 'path',
+'pgp_mime_signature_description' => {
+'default' => 'Digital signature',
+'type' => 'string',
 'text' => '
 
 
 
 <p>
-This variable contains the path to the Mixmaster binary on your
-system.  It is used with various sets of parameters to gather the
-list of known remailers, and to finally send a message through the
-mixmaster chain.
+This option sets the Content-Description used for signature parts in
+PGP/MIME signed messages.
 </p>
 '
 },
@@ -2448,6 +2495,21 @@ Set this to a directory and mutt will cache copies of messages from
 your IMAP and POP servers here. You are free to remove entries at any
 time, for instance if stale entries accumulate because you have
 deleted messages with another mail client.
+</p>
+'
+},
+
+'message_cache_clean' => {
+'default' => 'no',
+'type' => 'boolean',
+'text' => '
+
+
+
+<p>
+If set, mutt will clean out obsolete entries from the cache when
+the mailbox is synchronized. You probably only want to set it
+every once in a while, since it can be a little slow.
 </p>
 '
 },
@@ -2538,7 +2600,7 @@ at the top of the next page (0 lines of context).
 },
 
 'pager_format' => {
-'default' => '-%Z- %C/%m: %-20.20n   %s',
+'default' => '-%Z- %C/%m: %-20.20n   %s%*  -- (%P)',
 'type' => 'string',
 'text' => '
 
@@ -2712,6 +2774,46 @@ PGP or S/MIME output, so spoofing such lines is more difficult.
 If you are using colors to mark these lines, and rely on these,
 you may unset this setting.
 (Crypto only)
+</p>
+'
+},
+
+'sidebar_delim' => {
+'default' => '|',
+'type' => 'string',
+'text' => '
+
+
+
+<p>
+This specifies the delimiter between the sidebar (if visible) and 
+other screens.
+</p>
+'
+},
+
+'sidebar_visible' => {
+'default' => 'no',
+'type' => 'boolean',
+'text' => '
+
+
+
+<p>
+This specifies whether or not to show sidebar (left-side list of folders).
+</p>
+'
+},
+
+'sidebar_width' => {
+'default' => '0',
+'type' => 'number',
+'text' => '
+
+
+
+<p>
+The width of the sidebar.
 </p>
 '
 },
@@ -3434,6 +3536,11 @@ This variable contains the name of either a directory, or a file which
 contains trusted certificates for use with OpenSSL.
 (S/MIME only)
 </p>
+<p>
+<em>Note:</em> On Debian systems, this defaults to the first existing file in
+the following list: ˜/.smime/ca-certificates.crt ˜/.smime/ca-bundle.crt
+/etc/ssl/certs/ca-certificates.crt.
+</p>
 '
 },
 
@@ -3675,181 +3782,6 @@ keyid (the hash-value that OpenSSL generates) to work properly
 '
 },
 
-'ssl_client_cert' => {
-'default' => '',
-'type' => 'path',
-'text' => '
-
-
-
-<p>
-The file containing a client certificate and its associated private
-key.
-</p>
-'
-},
-
-'ssl_force_tls' => {
-'default' => 'no',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-If this variable is set, Mutt will require that all connections
-to remote servers be encrypted. Furthermore it will attempt to
-negotiate TLS even if the server does not advertise the capability,
-since it would otherwise have to abort the connection anyway. This
-option supersedes ``<a href="http://www.mutt.org/doc/manual/manual-6.html#ssl-starttls">$ssl_starttls</a>\'\'.
-</p>
-'
-},
-
-'ssl_starttls' => {
-'default' => 'yes',
-'type' => 'quadoption',
-'text' => '
-
-
-
-<p>
-If set (the default), mutt will attempt to use STARTTLS on servers
-advertising the capability. When unset, mutt will not attempt to
-use STARTTLS regardless of the server\'s capabilities.
-</p>
-'
-},
-
-'certificate_file' => {
-'default' => '~/.mutt_certificates',
-'type' => 'path',
-'text' => '
-
-
-
-<p>
-This variable specifies the file where the certificates you trust
-are saved. When an unknown certificate is encountered, you are asked
-if you accept it or not. If you accept it, the certificate can also 
-be saved in this file and further connections are automatically 
-accepted.
-</p>
-<p>
-You can also manually add CA certificates in this file. Any server
-certificate that is signed with one of these CA certificates are 
-also automatically accepted.
-</p>
-<p>
-Example: set certificate_file=˜/.mutt/certificates
-</p>
-'
-},
-
-'ssl_usesystemcerts' => {
-'default' => 'yes',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-If set to <em>yes</em>, mutt will use CA certificates in the
-system-wide certificate store when checking if server certificate 
-is signed by a trusted CA.
-</p>
-'
-},
-
-'entropy_file' => {
-'default' => '',
-'type' => 'path',
-'text' => '
-
-
-
-<p>
-The file which includes random data that is used to initialize SSL
-library functions.
-</p>
-'
-},
-
-'ssl_use_sslv2' => {
-'default' => 'yes',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-This variables specifies whether to attempt to use SSLv2 in the
-SSL authentication process.
-</p>
-'
-},
-
-'ssl_use_sslv3' => {
-'default' => 'yes',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-This variables specifies whether to attempt to use SSLv3 in the
-SSL authentication process.
-</p>
-'
-},
-
-'ssl_use_tlsv1' => {
-'default' => 'yes',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-This variables specifies whether to attempt to use TLSv1 in the
-SSL authentication process.
-</p>
-'
-},
-
-'ssl_min_dh_prime_bits' => {
-'default' => '0',
-'type' => 'number',
-'text' => '
-
-
-
-<p>
-This variable specifies the minimum acceptable prime size (in bits)
-for use in any Diffie-Hellman key exchange. A value of 0 will use
-the default from the GNUTLS library.
-</p>
-'
-},
-
-'ssl_ca_certificates_file' => {
-'default' => '',
-'type' => 'path',
-'text' => '
-
-
-
-<p>
-This variable specifies a file containing trusted CA certificates.
-Any server certificate that is signed with one of these CA
-certificates are also automatically accepted.
-</p>
-<p>
-Example: set ssl_ca_certificates_file=/etc/ssl/certs/ca-certificates.crt
-</p>
-'
-},
-
 'pipe_split' => {
 'default' => 'no',
 'type' => 'boolean',
@@ -4067,7 +3999,8 @@ string after the inclusion of a message which is being replied to.
 
 <p>
 Controls whether or not messages are saved in the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#postponed">$postponed</a>\'\'
-mailbox when you elect not to send immediately.
+mailbox when you elect not to send immediately. Also see the
+``<a href="http://www.mutt.org/doc/manual/manual-6.html#recall">$recall</a>\'\' variable.
 </p>
 '
 },
@@ -4213,6 +4146,59 @@ This specifies the command that mutt will use to make external address
 queries.  The string should contain a %s, which will be substituted
 with the query string the user types.  See ``<a href="http://www.mutt.org/doc/manual/manual-6.html#query">query</a>\'\' for more
 information.
+</p>
+'
+},
+
+'query_format' => {
+'default' => '%4c %t %-25.25a %-25.25n %?e?(%e)?',
+'type' => 'string',
+'text' => '
+
+
+
+<p>
+This variable describes the format of the `query\' menu. The
+following printf-style sequences are understood:
+</p>
+<p>
+
+
+<dl>
+
+<dt><strong>%a  </strong></dt>
+<dd><p>destination address
+</p></dd>
+<dt><strong>%c  </strong></dt>
+<dd><p>current entry number
+</p></dd>
+<dt><strong>%e  </strong></dt>
+<dd><p>extra information *
+</p></dd>
+<dt><strong>%n  </strong></dt>
+<dd><p>destination name
+</p></dd>
+<dt><strong>%t  </strong></dt>
+<dd><p>``*\'\' if current entry is tagged, a space otherwise
+</p></dd>
+<dt><strong>%>X </strong></dt>
+<dd><p>right justify the rest of the string and pad with "X"
+</p></dd>
+<dt><strong>%|X </strong></dt>
+<dd><p>pad to the end of the line with "X"
+</p></dd>
+<dt><strong>%*X </strong></dt>
+<dd><p>soft-fill with character "X" as pad
+</p></dd>
+</dl>
+
+
+</p>
+<p>
+For an explanation of `soft-fill\', see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#index-format">$index_format</a>\'\' documentation.
+</p>
+<p>
+* = can be optionally printed if nonzero, see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#status-format">$status_format</a>\'\' documentation.
 </p>
 '
 },
@@ -4656,13 +4642,17 @@ of this variable will never mark a message read.
 
 
 <p>
-A list of character sets for outgoing messages. Mutt will use the
+A colon-delimited list of character sets for outgoing messages. Mutt will use the
 first character set into which the text can be converted exactly.
 If your ``<a href="http://www.mutt.org/doc/manual/manual-6.html#charset">$charset</a>\'\' is not iso-8859-1 and recipients may not
 understand UTF-8, it is advisable to include in the list an
 appropriate widely used standard character set (such as
 iso-8859-2, koi8-r or iso-2022-jp) either instead of or after
 "iso-8859-1".
+</p>
+<p>
+In case the text cannot be converted into one of these exactly,
+mutt uses ``<a href="http://www.mutt.org/doc/manual/manual-6.html#charset">$charset</a>\'\' as a fallback.
 </p>
 '
 },
@@ -4854,6 +4844,24 @@ a value of zero for this option suppresses the pause.
 '
 },
 
+'smtp_pass' => {
+'default' => '',
+'type' => 'string',
+'text' => '
+
+
+
+<p>
+Specifies the password for your SMTP account.  If <em>unset</em>, Mutt will
+prompt you for your password when you first send mail via SMTP.
+See ``<a href="http://www.mutt.org/doc/manual/manual-6.html#smtp-url">smtp_url</a>\'\' to configure mutt to send mail via SMTP.
+<em>Warning</em>: you should only use this option when you are on a
+fairly secure machine, because the superuser can read your muttrc even
+if you are the only one who can read the file.
+</p>
+'
+},
+
 'smtp_url' => {
 'default' => '',
 'type' => 'string',
@@ -4907,6 +4915,10 @@ are:
 <p>
 You may optionally use the reverse- prefix to specify reverse sorting
 order (example: set sort=reverse-date-sent).
+</p>
+<p>
+<em>Note:</em> On Debian systems, this option is set by default to
+``threads\'\' in /etc/Muttrc.
 </p>
 '
 },
@@ -5151,9 +5163,15 @@ according to <a href="http://www.mutt.org/doc/manual/manual-6.html#status-chars"
 <dt><strong>%|X </strong></dt>
 <dd><p>pad to the end of the line with "X"
 </p></dd>
+<dt><strong>%*X </strong></dt>
+<dd><p>soft-fill with character "X" as pad
+</p></dd>
 </dl>
 
 
+</p>
+<p>
+For an explanation of `soft-fill\', see the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#index-format">$index_format</a>\'\' documentation.
 </p>
 <p>
 * = can be optionally printed if nonzero
@@ -5317,6 +5335,23 @@ screen with a tilde (˜).
 '
 },
 
+'time_inc' => {
+'default' => '0',
+'type' => 'number',
+'text' => '
+
+
+
+<p>
+Along with ``<a href="http://www.mutt.org/doc/manual/manual-6.html#read-inc">read_inc</a>\'\', ``<a href="http://www.mutt.org/doc/manual/manual-6.html#write-inc">write_inc</a>\'\', and ``<a href="http://www.mutt.org/doc/manual/manual-6.html#net-inc">net_inc</a>\'\', this
+variable controls the frequency with which progress updates are
+displayed. It suppresses updates less than ``<a href="http://www.mutt.org/doc/manual/manual-6.html#time-inc">time_inc</a>\'\' milliseconds
+apart. This can improve throughput on systems with slow terminals,
+or when running mutt on a remote system.
+</p>
+'
+},
+
 'timeout' => {
 'default' => '600',
 'type' => 'number',
@@ -5325,10 +5360,19 @@ screen with a tilde (˜).
 
 
 <p>
-This variable controls the <em>number of seconds</em> Mutt will wait
-for a key to be pressed in the main menu before timing out and
-checking for new mail.  A value of zero or less will cause Mutt
-to never time out.
+When Mutt is waiting for user input either idleing in menus or
+in an interactive prompt, Mutt would block until input is
+present. Depending on the context, this would prevent certain
+operations from working, like checking for new mail or keeping
+an IMAP connection alive.
+</p>
+<p>
+This variable controls how many seconds Mutt will at most wait
+until it aborts waiting for input, performs these operations and
+continues to wait for input.
+</p>
+<p>
+A value of zero or less will cause Mutt to never time out.
 </p>
 '
 },
@@ -5367,6 +5411,25 @@ address is specified in the CC header field, but you are not the only
 recipient.  The fifth character is used to indicate mail that was sent
 by <em>you</em>.  The sixth character is used to indicate when a mail
 was sent to a mailing-list you subscribe to (default: L).
+</p>
+'
+},
+
+'trash' => {
+'default' => '',
+'type' => 'path',
+'text' => '
+
+
+
+<p>
+If set, this variable specifies the path of the trash folder where the
+mails marked for deletion will be moved, instead of being irremediably
+purged.
+</p>
+<p>
+NOTE: When you delete a message in the trash folder, it is really
+deleted, so that you have a way to clean the trash.
 </p>
 '
 },
@@ -5435,13 +5498,16 @@ addresses will be qualified.
 
 
 <p>
-When <em>set</em>, mutt will use ``<a href="http://www.mutt.org/doc/manual/manual-6.html#envelope-from-address">$envelope_from_address</a>\'\' as the
-<em>envelope</em> sender if that is set, otherwise it will attempt to
-derive it from the "From:" header.  Note that this information is passed 
-to sendmail command using the "-f" command line switch, so don\'t set this
-option if you are using that switch in <a href="http://www.mutt.org/doc/manual/manual-6.html#sendmail">$sendmail</a> yourself,
-or if the sendmail on your machine doesn\'t support that command
-line switch.
+When <em>set</em>, mutt will set the <em>envelope</em> sender of the message.
+If ``<a href="http://www.mutt.org/doc/manual/manual-6.html#envelope-from-address">$envelope_from_address</a>\'\' is set, it will be used as the sender
+address. If not, mutt will attempt to derive the sender from the
+"From:" header.
+</p>
+<p>
+Note that this information is passed to sendmail command using the
+"-f" command line switch. Therefore setting this option is not useful
+if the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#sendmail">$sendmail</a>\'\' variable already contains "-f" or if the
+executable pointed to by <a href="http://www.mutt.org/doc/manual/manual-6.html#sendmail">$sendmail</a> doesn\'t support the "-f" switch.
 </p>
 '
 },
@@ -5458,21 +5524,6 @@ When <em>set</em>, Mutt will generate the `From:\' header field when
 sending messages.  If <em>unset</em>, no `From:\' header field will be
 generated unless the user explicitly sets one using the ``<a href="http://www.mutt.org/doc/manual/manual-6.html#my-hdr">my_hdr</a>\'\'
 command.
-</p>
-'
-},
-
-'use_idn' => {
-'default' => 'yes',
-'type' => 'boolean',
-'text' => '
-
-
-
-<p>
-When <em>set</em>, Mutt will show you international domain names decoded.
-Note: You can use IDNs for addresses even if this is <em>unset</em>.
-This variable only affects decoding.
 </p>
 '
 },
@@ -5636,6 +5687,54 @@ is set to deliver directly via SMTP (see ``<a href="http://www.mutt.org/doc/manu
 option does nothing: mutt will never write out the BCC header
 in this case.
 </p>
+<p>
+<em>Note:</em> On Debian systems, exim4 and postfix strip BCC headers by
+default. The above warning applies to exim3 users, see /etc/Muttrc.
+</p>
+'
+},
+
+'xterm_icon' => {
+'default' => 'M%?n?AIL&ail?',
+'type' => 'string',
+'text' => '
+
+
+
+<p>
+Controls the format of the icon title, as long as xterm_set_titles
+is enabled. This string is identical in formatting to the one used by
+``<a href="http://www.mutt.org/doc/manual/manual-6.html#status-format">$status_format</a>\'\'.
+</p>
+'
+},
+
+'xterm_set_titles' => {
+'default' => 'no',
+'type' => 'boolean',
+'text' => '
+
+
+
+<p>
+Controls whether mutt sets the xterm title bar and icon name
+(as long as you are in an appropriate terminal).
+</p>
+'
+},
+
+'xterm_title' => {
+'default' => 'Mutt with %?m?%m messages&no messages?%?n? [%n NEW]?',
+'type' => 'string',
+'text' => '
+
+
+
+<p>
+Controls the format of the title bar of the xterm provided that
+xterm_set_titles has been set. This string is identical in formatting
+to the one used by ``<a href="http://www.mutt.org/doc/manual/manual-6.html#status-format">$status_format</a>\'\'.
+</p>
 '
 },
 
@@ -5646,3067 +5745,3204 @@ __DATA__
 #
 #  abort_nosubject
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   If set to yes, when composing messages and no subject is given at the
-#   subject prompt, composition will be aborted. If set to no, composing
-#   messages with no subject given at the subject prompt will never be
-#   aborted.
+#If set to yes, when composing messages and no subject is given at the subject
+#prompt, composition will be aborted. If set to no, composing messages with no
+#subject given at the subject prompt will never be aborted.
 #
 #  abort_unmodified
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   If set to yes, composition will automatically abort after editing the
-#   message body if no changes are made to the file (this check only
-#   happens after the first edit of the file). When set to no, composition
-#   will never be aborted.
+#If set to yes, composition will automatically abort after editing the message
+#body if no changes are made to the file (this check only happens after the
+#first edit of the file). When set to no, composition will never be aborted.
 #
 #  alias_file
 #
-#   Type: path
-#   Default: "~/.muttrc"
+#Type: path
+#Default: "~/.muttrc"
 #
-#   The default file in which to save aliases created by the
-#   ``create-alias'' function.
+#The default file in which to save aliases created by the ``create-alias''
+#function.
 #
-#   Note: Mutt will not automatically source this file; you must
-#   explicitly use the ``source'' command for it to be executed.
+#Note: Mutt will not automatically source this file; you must explicitly use the
+#``source'' command for it to be executed.
 #
-#   The default for this option is the currently used muttrc file, or
-#   ``~/.muttrc'' if no user muttrc was found.
+#The default for this option is the currently used muttrc file, or ``~/.muttrc''
+#if no user muttrc was found.
 #
 #  alias_format
 #
-#   Type: string
-#   Default: "%4n %2f %t %-10a   %r"
+#Type: string
+#Default: "%4n %2f %t %-10a %r"
 #
-#   Specifies the format of the data displayed for the `alias' menu. The
-#   following printf(3)-style sequences are available:
+#Specifies the format of the data displayed for the `alias' menu. The following
+#printf(3)-style sequences are available:
 #
-#   %a
-#          alias name
+#%a
 #
-#   %f
-#          flags - currently, a "d" for an alias marked for deletion
+#    alias name
 #
-#   %n
-#          index number
+#%f
 #
-#   %r
-#          address which alias expands to
+#    flags - currently, a "d" for an alias marked for deletion
 #
-#   %t
-#          character which indicates if the alias is tagged for inclusion
+#%n
+#
+#    index number
+#
+#%r
+#
+#    address which alias expands to
+#
+#%t
+#
+#    character which indicates if the alias is tagged for inclusion
 #
 #  allow_8bit
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether 8-bit data is converted to 7-bit using either Quoted-
-#   Printable or Base64 encoding when sending mail.
+#Controls whether 8-bit data is converted to 7-bit using either Quoted-
+#Printable or Base64 encoding when sending mail.
 #
 #  allow_ansi
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Controls whether ANSI color codes in messages (and color tags in rich
-#   text messages) are to be interpreted. Messages containing these codes
-#   are rare, but if this option is set, their text will be colored
-#   accordingly. Note that this may override your color choices, and even
-#   present a security problem, since a message could include a line like
-#   "[-- PGP output follows ..." and give it the same color as your
-#   attachment color.
+#Controls whether ANSI color codes in messages (and color tags in rich text
+#messages) are to be interpreted. Messages containing these codes are rare, but
+#if this option is set, their text will be colored accordingly. Note that this
+#may override your color choices, and even present a security problem, since a
+#message could include a line like "[-- PGP output follows ..." and give it the
+#same color as your attachment color.
 #
 #  arrow_cursor
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, an arrow (``->'') will be used to indicate the current entry
-#   in menus instead of highlighting the whole line. On slow network or
-#   modem links this will make response faster because there is less that
-#   has to be redrawn on the screen when moving to the next or previous
-#   entries in the menu.
+#When set, an arrow (``->'') will be used to indicate the current entry in menus
+#instead of highlighting the whole line. On slow network or modem links this
+#will make response faster because there is less that has to be redrawn on the
+#screen when moving to the next or previous entries in the menu.
 #
 #  ascii_chars
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, Mutt will use plain ASCII characters when displaying thread
-#   and attachment trees, instead of the default ACS characters.
+#If set, Mutt will use plain ASCII characters when displaying thread and
+#attachment trees, instead of the default ACS characters.
 #
 #  askbcc
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, Mutt will prompt you for blind-carbon-copy (Bcc) recipients
-#   before editing an outgoing message.
+#If set, Mutt will prompt you for blind-carbon-copy (Bcc) recipients before
+#editing an outgoing message.
 #
 #  askcc
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, Mutt will prompt you for carbon-copy (Cc) recipients before
-#   editing the body of an outgoing message.
+#If set, Mutt will prompt you for carbon-copy (Cc) recipients before editing the
+#body of an outgoing message.
 #
 #  assumed_charset
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This variable is a colon-separated list of character encoding schemes
-#   for messages without character encoding indication. Header field
-#   values and message body content without character encoding indication
-#   would be assumed that they are written in one of this list. By
-#   default, all the header fields and message body without any charset
-#   indication are assumed to be in "us-ascii".
+#This variable is a colon-separated list of character encoding schemes for
+#messages without character encoding indication. Header field values and message
+#body content without character encoding indication would be assumed that they
+#are written in one of this list. By default, all the header fields and message
+#body without any charset indication are assumed to be in "us-ascii".
 #
-#   For example, Japanese users might prefer this:
+#For example, Japanese users might prefer this:
 #
-#   set assumed_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
+#set assumed_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
 #
-#   However, only the first content is valid for the message body.
+#However, only the first content is valid for the message body.
 #
 #  attach_charset
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This variable is a colon-separated list of character encoding schemes
-#   for text file attachments. If unset, $charset value will be used
-#   instead. For example, the following configuration would work for
-#   Japanese text handling:
+#This variable is a colon-separated list of character encoding schemes for text
+#file attachments. If unset, $charset value will be used instead. For example,
+#the following configuration would work for Japanese text handling:
 #
-#   set attach_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
+#set attach_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
 #
-#   Note: "iso-2022-*" must be put at the head of the value as shown above
-#   if included.
+#Note: "iso-2022-*" must be put at the head of the value as shown above if
+#included.
 #
 #  attach_format
 #
-#   Type: string
-#   Default: "%u%D%I %t%4n %T%.40d%> [%.7m/%.10M, %.6e%?C?, %C?, %s] "
+#Type: string
+#Default: "%u%D%I %t%4n %T%.40d%> [%.7m/%.10M, %.6e%?C?, %C?, %s] "
 #
-#   This variable describes the format of the `attachment' menu. The
-#   following printf-style sequences are understood:
+#This variable describes the format of the `attachment' menu. The following
+#printf-style sequences are understood:
 #
-#   %C
-#          charset
+#%C
 #
-#   %c
-#          requires charset conversion (n or c)
+#    charset
 #
-#   %D
-#          deleted flag
+#%c
 #
-#   %d
-#          description
+#    requires charset conversion (n or c)
 #
-#   %e
-#          MIME content-transfer-encoding
+#%D
 #
-#   %f
-#          filename
+#    deleted flag
 #
-#   %I
-#          disposition (I=inline, A=attachment)
+#%d
 #
-#   %m
-#          major MIME type
+#    description
 #
-#   %M
-#          MIME subtype
+#%e
 #
-#   %n
-#          attachment number
+#    MIME content-transfer-encoding
 #
-#   %Q
-#          "Q", if MIME part qualifies for attachment counting
+#%f
 #
-#   %s
-#          size
+#    filename
 #
-#   %t
-#          tagged flag
+#%I
 #
-#   %T
-#          graphic tree characters
+#    disposition (I=inline, A=attachment)
 #
-#   %u
-#          unlink (=to delete) flag
+#%m
 #
-#   %X
-#          number of qualifying MIME parts in this part and its children
-#          (please see the ``attachments'' section for possible speed
-#          effects)
+#    major MIME type
 #
-#   %>X
-#          right justify the rest of the string and pad with character "X"
+#%M
 #
-#   %|X
-#          pad to the end of the line with character "X"
+#    MIME subtype
+#
+#%n
+#
+#    attachment number
+#
+#%Q
+#
+#    "Q", if MIME part qualifies for attachment counting
+#
+#%s
+#
+#    size
+#
+#%t
+#
+#    tagged flag
+#
+#%T
+#
+#    graphic tree characters
+#
+#%u
+#
+#    unlink (=to delete) flag
+#
+#%X
+#
+#    number of qualifying MIME parts in this part and its children (please see
+#    the ``attachments'' section for possible speed effects)
+#
+#%>X
+#
+#    right justify the rest of the string and pad with character "X"
+#
+#%|X
+#
+#    pad to the end of the line with character "X"
+#
+#%*X
+#
+#    soft-fill with character "X" as pad
+#
+#For an explanation of `soft-fill', see the ``$index_format'' documentation.
 #
 #  attach_sep
 #
-#   Type: string
-#   Default: "\n"
+#Type: string
+#Default: "\n"
 #
-#   The separator to add between attachments when operating (saving,
-#   printing, piping, etc) on a list of tagged attachments.
+#The separator to add between attachments when operating (saving, printing,
+#piping, etc) on a list of tagged attachments.
 #
 #  attach_split
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If this variable is unset, when operating (saving, printing, piping,
-#   etc) on a list of tagged attachments, Mutt will concatenate the
-#   attachments and will operate on them as a single attachment. The
-#   ``$attach_sep'' separator is added after each attachment. When set,
-#   Mutt will operate on the attachments one by one.
+#If this variable is unset, when operating (saving, printing, piping, etc) on a
+#list of tagged attachments, Mutt will concatenate the attachments and will
+#operate on them as a single attachment. The ``$attach_sep'' separator is added
+#after each attachment. When set, Mutt will operate on the attachments one by
+#one.
 #
 #  attribution
 #
-#   Type: string
-#   Default: "On %d, %n wrote:"
+#Type: string
+#Default: "On %d, %n wrote:"
 #
-#   This is the string that will precede a message which has been included
-#   in a reply. For a full listing of defined printf()-like sequences see
-#   the section on ``$index_format''.
+#This is the string that will precede a message which has been included in a
+#reply. For a full listing of defined printf()-like sequences see the section on
+#``$index_format''.
 #
 #  autoedit
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set along with ``$edit_headers'', Mutt will skip the initial
-#   send-menu and allow you to immediately begin editing the body of your
-#   message. The send-menu may still be accessed once you have finished
-#   editing the body of your message.
+#When set along with ``$edit_headers'', Mutt will skip the initial send-menu and
+#allow you to immediately begin editing the body of your message. The send-menu
+#may still be accessed once you have finished editing the body of your message.
 #
-#   Also see ``$fast_reply''.
+#Also see ``$fast_reply''.
 #
 #  auto_tag
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, functions in the index menu which affect a message will be
-#   applied to all tagged messages (if there are any). When unset, you
-#   must first use the tag-prefix function (default: ";") to make the next
-#   function apply to all tagged messages.
+#When set, functions in the index menu which affect a message will be applied to
+#all tagged messages (if there are any). When unset, you must first use the
+#tag-prefix function (default: ";") to make the next function apply to all
+#tagged messages.
 #
 #  beep
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When this variable is set, mutt will beep when an error occurs.
+#When this variable is set, mutt will beep when an error occurs.
 #
 #  beep_new
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When this variable is set, mutt will beep whenever it prints a message
-#   notifying you of new mail. This is independent of the setting of the
-#   ``$beep'' variable.
+#When this variable is set, mutt will beep whenever it prints a message
+#notifying you of new mail. This is independent of the setting of the ``$beep''
+#variable.
 #
 #  bounce
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether you will be asked to confirm bouncing messages. If
-#   set to yes you don't get asked if you want to bounce a message.
-#   Setting this variable to no is not generally useful, and thus not
-#   recommended, because you are unable to bounce messages.
+#Controls whether you will be asked to confirm bouncing messages. If set to yes
+#you don't get asked if you want to bounce a message. Setting this variable to
+#no is not generally useful, and thus not recommended, because you are unable to
+#bounce messages.
 #
 #  bounce_delivered
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When this variable is set, mutt will include Delivered-To headers when
-#   bouncing messages. Postfix users may wish to unset this variable.
+#When this variable is set, mutt will include Delivered-To headers when bouncing
+#messages. Postfix users may wish to unset this variable.
 #
 #  braille_friendly
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When this variable is set, mutt will place the cursor at the beginning
-#   of the current line in menus, even when the arrow_cursor variable is
-#   unset, making it easier for blind persons using Braille displays to
-#   follow these menus. The option is disabled by default because many
-#   visual terminals don't permit making the cursor invisible.
+#When this variable is set, mutt will place the cursor at the beginning of the
+#current line in menus, even when the arrow_cursor variable is unset, making it
+#easier for blind persons using Braille displays to follow these menus. The
+#option is disabled by default because many visual terminals don't permit making
+#the cursor invisible.
 #
 #  check_mbox_size
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When this variable is set, mutt will use file size attribute instead
-#   of access time when checking for new mail.
+#When this variable is set, mutt will use file size attribute instead of access
+#time when checking for new mail.
 #
 #  charset
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Character set your terminal uses to display and enter textual data.
+#Character set your terminal uses to display and enter textual data. It is also
+#the fallback for $send_charset.
 #
 #  check_new
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Note: this option only affects maildir and MH style mailboxes.
+#Note: this option only affects maildir and MH style mailboxes.
 #
-#   When set, Mutt will check for new mail delivered while the mailbox is
-#   open. Especially with MH mailboxes, this operation can take quite some
-#   time since it involves scanning the directory and checking each file
-#   to see if it has already been looked at. If check_new is unset, no
-#   check for new mail is performed while the mailbox is open.
+#When set, Mutt will check for new mail delivered while the mailbox is open.
+#Especially with MH mailboxes, this operation can take quite some time since it
+#involves scanning the directory and checking each file to see if it has already
+#been looked at. If check_new is unset, no check for new mail is performed while
+#the mailbox is open.
 #
 #  collapse_unread
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When unset, Mutt will not collapse a thread if it contains any unread
-#   messages.
+#When unset, Mutt will not collapse a thread if it contains any unread messages.
 #
 #  uncollapse_jump
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, Mutt will jump to the next unread message, if any, when the
-#   current thread is uncollapsed.
+#When set, Mutt will jump to the next unread message, if any, when the current
+#thread is uncollapsed.
 #
 #  compose_format
 #
-#   Type: string
-#   Default: "-- Mutt: Compose  [Approx. msg size: %l   Atts: %a]%>-"
+#Type: string
+#Default: "-- Mutt: Compose [Approx. msg size: %l Atts: %a]%>-"
 #
-#   Controls the format of the status line displayed in the Compose menu.
-#   This string is similar to ``$status_format'', but has its own set of
-#   printf()-like sequences:
+#Controls the format of the status line displayed in the Compose menu. This
+#string is similar to ``$status_format'', but has its own set of printf()-like
+#sequences:
 #
-#   %a
-#          total number of attachments
+#%a
 #
-#   %h
-#          local hostname
+#    total number of attachments
 #
-#   %l
-#          approximate size (in bytes) of the current message
+#%h
 #
-#   %v
-#          Mutt version string
+#    local hostname
 #
-#   See the text describing the ``$status_format'' option for more
-#   information on how to set ``$compose_format''.
+#%l
+#
+#    approximate size (in bytes) of the current message
+#
+#%v
+#
+#    Mutt version string
+#
+#See the text describing the ``$status_format'' option for more information on
+#how to set ``$compose_format''.
 #
 #  config_charset
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   When defined, Mutt will recode commands in rc files from this
-#   encoding.
+#When defined, Mutt will recode commands in rc files from this encoding.
 #
 #  confirmappend
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will prompt for confirmation when appending messages to
-#   an existing mailbox.
+#When set, Mutt will prompt for confirmation when appending messages to an
+#existing mailbox.
 #
 #  confirmcreate
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will prompt for confirmation when saving messages to a
-#   mailbox which does not yet exist before creating it.
+#When set, Mutt will prompt for confirmation when saving messages to a mailbox
+#which does not yet exist before creating it.
 #
 #  connect_timeout
 #
-#   Type: number
-#   Default: 30
+#Type: number
+#Default: 30
 #
-#   Causes Mutt to timeout a network connection (for IMAP or POP) after
-#   this many seconds if the connection is not able to be established. A
-#   negative value causes Mutt to wait indefinitely for the connection to
-#   succeed.
+#Causes Mutt to timeout a network connection (for IMAP or POP) after this many
+#seconds if the connection is not able to be established. A negative value
+#causes Mutt to wait indefinitely for the connection to succeed.
 #
 #  content_type
 #
-#   Type: string
-#   Default: "text/plain"
+#Type: string
+#Default: "text/plain"
 #
-#   Sets the default Content-Type for the body of newly composed messages.
+#Sets the default Content-Type for the body of newly composed messages.
 #
 #  copy
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   This variable controls whether or not copies of your outgoing messages
-#   will be saved for later references. Also see ``$record'',
-#   ``$save_name'', ``$force_name'' and ``fcc-hook''.
+#This variable controls whether or not copies of your outgoing messages will be
+#saved for later references. Also see ``$record'', ``$save_name'', ``$force_name
+#'' and ``fcc-hook''.
 #
 #  crypt_use_gpgme
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable controls the use of the GPGME-enabled crypto backends.
-#   If it is set and Mutt was built with gpgme support, the gpgme code for
-#   S/MIME and PGP will be used instead of the classic code. Note that you
-#   need to set this option in .muttrc; it won't have any effect when used
-#   interactively.
+#This variable controls the use of the GPGME-enabled crypto backends. If it is
+#set and Mutt was built with gpgme support, the gpgme code for S/MIME and PGP
+#will be used instead of the classic code. Note that you need to set this option
+#in .muttrc; it won't have any effect when used interactively.
 #
 #  crypt_use_pka
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   (http://www.g10code.de/docs/pka-intro.de.pdf) during signature
-#   verification (only supported by the GPGME backend).
+#(http://www.g10code.de/docs/pka-intro.de.pdf) during signature verification
+#(only supported by the GPGME backend).
 #
 #  crypt_autopgp
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable controls whether or not mutt may automatically enable
-#   PGP encryption/signing for messages. See also ``$crypt_autoencrypt'',
-#   ``$crypt_replyencrypt'', ``$crypt_autosign'', ``$crypt_replysign'' and
-#   ``$smime_is_default''.
+#This variable controls whether or not mutt may automatically enable PGP
+#encryption/signing for messages. See also ``$crypt_autoencrypt'', ``
+#$crypt_replyencrypt'', ``$crypt_autosign'', ``$crypt_replysign'' and ``
+#$smime_is_default''.
 #
 #  crypt_autosmime
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable controls whether or not mutt may automatically enable
-#   S/MIME encryption/signing for messages. See also
-#   ``$crypt_autoencrypt'', ``$crypt_replyencrypt'', ``$crypt_autosign'',
-#   ``$crypt_replysign'' and ``$smime_is_default''.
+#This variable controls whether or not mutt may automatically enable S/MIME
+#encryption/signing for messages. See also ``$crypt_autoencrypt'', ``
+#$crypt_replyencrypt'', ``$crypt_autosign'', ``$crypt_replysign'' and ``
+#$smime_is_default''.
 #
 #  date_format
 #
-#   Type: string
-#   Default: "!%a, %b %d, %Y at %I:%M:%S%p %Z"
+#Type: string
+#Default: "!%a, %b %d, %Y at %I:%M:%S%p %Z"
 #
-#   This variable controls the format of the date printed by the ``%d''
-#   sequence in ``$index_format''. This is passed to the strftime call to
-#   process the date. See the man page for strftime(3) for the proper
-#   syntax.
+#This variable controls the format of the date printed by the ``%d'' sequence in
+#``$index_format''. This is passed to the strftime call to process the date. See
+#the man page for strftime(3) for the proper syntax.
 #
-#   Unless the first character in the string is a bang (``!''), the month
-#   and week day names are expanded according to the locale specified in
-#   the variable ``$locale''. If the first character in the string is a
-#   bang, the bang is discarded, and the month and week day names in the
-#   rest of the string are expanded in the C locale (that is in US
-#   English).
+#Unless the first character in the string is a bang (``!''), the month and week
+#day names are expanded according to the locale specified in the variable ``
+#$locale''. If the first character in the string is a bang, the bang is
+#discarded, and the month and week day names in the rest of the string are
+#expanded in the C locale (that is in US English).
 #
 #  default_hook
 #
-#   Type: string
-#   Default: "~f %s !~P | (~P ~C %s)"
+#Type: string
+#Default: "~f %s !~P | (~P ~C %s)"
 #
-#   This variable controls how message-hooks, reply-hooks, send-hooks,
-#   send2-hooks, save-hooks, and fcc-hooks will be interpreted if they are
-#   specified with only a simple regexp, instead of a matching pattern.
-#   The hooks are expanded when they are declared, so a hook will be
-#   interpreted according to the value of this variable at the time the
-#   hook is declared. The default value matches if the message is either
-#   from a user matching the regular expression given, or if it is from
-#   you (if the from address matches ``alternates'') and is to or cc'ed to
-#   a user matching the given regular expression.
+#This variable controls how message-hooks, reply-hooks, send-hooks, send2-hooks,
+#save-hooks, and fcc-hooks will be interpreted if they are specified with only a
+#simple regexp, instead of a matching pattern. The hooks are expanded when they
+#are declared, so a hook will be interpreted according to the value of this
+#variable at the time the hook is declared. The default value matches if the
+#message is either from a user matching the regular expression given, or if it
+#is from you (if the from address matches ``alternates'') and is to or cc'ed to
+#a user matching the given regular expression.
 #
 #  delete
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether or not messages are really deleted when closing or
-#   synchronizing a mailbox. If set to yes, messages marked for deleting
-#   will automatically be purged without prompting. If set to no, messages
-#   marked for deletion will be kept in the mailbox.
+#Controls whether or not messages are really deleted when closing or
+#synchronizing a mailbox. If set to yes, messages marked for deleting will
+#automatically be purged without prompting. If set to no, messages marked for
+#deletion will be kept in the mailbox.
 #
 #  delete_untag
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If this option is set, mutt will untag messages when marking them for
-#   deletion. This applies when you either explicitly delete a message, or
-#   when you save it to another folder.
+#If this option is set, mutt will untag messages when marking them for deletion.
+#This applies when you either explicitly delete a message, or when you save it
+#to another folder.
 #
 #  digest_collapse
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If this option is set, mutt's received-attachments menu will not show
-#   the subparts of individual messages in a multipart/digest. To see
-#   these subparts, press 'v' on that menu.
+#If this option is set, mutt's received-attachments menu will not show the
+#subparts of individual messages in a multipart/digest. To see these subparts,
+#press 'v' on that menu.
 #
 #  display_filter
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   When set, specifies a command used to filter messages. When a message
-#   is viewed it is passed as standard input to $display_filter, and the
-#   filtered message is read from the standard output.
+#When set, specifies a command used to filter messages. When a message is viewed
+#it is passed as standard input to $display_filter, and the filtered message is
+#read from the standard output.
 #
 #  dotlock_program
 #
-#   Type: path
-#   Default: "/usr/local/bin/mutt_dotlock"
+#Type: path
+#Default: "/usr/local/bin/mutt_dotlock"
 #
-#   Contains the path of the mutt_dotlock (8) binary to be used by mutt.
+#Contains the path of the mutt_dotlock (8) binary to be used by mutt.
 #
 #  dsn_notify
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Note: you should not enable this unless you are using Sendmail 8.8.x
-#   or greater.
+#This variable sets the request for when notification is returned. The string
+#consists of a comma separated list (no spaces!) of one or more of the
+#following: never, to never request notification, failure, to request
+#notification on transmission failure, delay, to be notified of message delays,
+#success, to be notified of successful transmission.
 #
-#   This variable sets the request for when notification is returned. The
-#   string consists of a comma separated list (no spaces!) of one or more
-#   of the following: never, to never request notification, failure, to
-#   request notification on transmission failure, delay, to be notified of
-#   message delays, success, to be notified of successful transmission.
+#Example: set dsn_notify="failure,delay"
 #
-#   Example: set dsn_notify="failure,delay"
+#Note: when using $sendmail for delivery, you should not enable this unless you
+#are either using Sendmail 8.8.x or greater or a MTA providing a sendmail(1)
+#-compatible interface supporting the -N option for DSN. For SMTP delivery, it
+#depends on the server whether DSN is supported or not.
 #
 #  dsn_return
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Note: you should not enable this unless you are using Sendmail 8.8.x
-#   or greater.
+#This variable controls how much of your message is returned in DSN messages. It
+#may be set to either hdrs to return just the message header, or full to return
+#the full message.
 #
-#   This variable controls how much of your message is returned in DSN
-#   messages. It may be set to either hdrs to return just the message
-#   header, or full to return the full message.
+#Example: set dsn_return=hdrs
 #
-#   Example: set dsn_return=hdrs
+#Note: when using $sendmail for delivery, you should not enable this unless you
+#are either using Sendmail 8.8.x or greater or a MTA providing a sendmail(1)
+#-compatible interface supporting the -R option for DSN. For SMTP delivery, it
+#depends on the server whether DSN is supported or not.
 #
 #  duplicate_threads
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable controls whether mutt, when sorting by threads, threads
-#   messages with the same message-id together. If it is set, it will
-#   indicate that it thinks they are duplicates of each other with an
-#   equals sign in the thread diagram.
+#This variable controls whether mutt, when sorting by threads, threads messages
+#with the same message-id together. If it is set, it will indicate that it
+#thinks they are duplicates of each other with an equals sign in the thread
+#diagram.
 #
 #  edit_headers
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This option allows you to edit the header of your outgoing messages
-#   along with the body of your message.
+#This option allows you to edit the header of your outgoing messages along with
+#the body of your message.
+#
+#Note that changes made to the References: and Date: headers are ignored for
+#interoperability reasons.
 #
 #  editor
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   This variable specifies which editor is used by mutt. It defaults to
-#   the value of the VISUAL, or EDITOR, environment variable, or to the
-#   string "vi" if neither of those are set.
+#This variable specifies which editor is used by mutt. It defaults to the value
+#of the VISUAL, or EDITOR, environment variable, or to the string "vi" if
+#neither of those are set.
 #
 #  encode_from
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will quoted-printable encode messages when they contain
-#   the string "From " in the beginning of a line. Useful to avoid the
-#   tampering certain mail delivery and transport agents tend to do with
-#   messages.
+#When set, mutt will quoted-printable encode messages when they contain the
+#string "From " in the beginning of a line. Useful to avoid the tampering
+#certain mail delivery and transport agents tend to do with messages.
 #
 #  envelope_from_address
 #
-#   Type: e-mail address
-#   Default: ""
+#Type: e-mail address
+#Default: ""
 #
-#   Manually sets the envelope sender for outgoing messages. This value is
-#   ignored if ``$use_envelope_from'' is unset.
+#Manually sets the envelope sender for outgoing messages. This value is ignored
+#if ``$use_envelope_from'' is unset.
 #
 #  escape
 #
-#   Type: string
-#   Default: "~"
+#Type: string
+#Default: "~"
 #
-#   Escape character to use for functions in the builtin editor.
+#Escape character to use for functions in the builtin editor.
 #
 #  fast_reply
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, the initial prompt for recipients and subject are skipped
-#   when replying to messages, and the initial prompt for subject is
-#   skipped when forwarding messages.
+#When set, the initial prompt for recipients and subject are skipped when
+#replying to messages, and the initial prompt for subject is skipped when
+#forwarding messages.
 #
-#   Note: this variable has no effect when the ``$autoedit'' variable is
-#   set.
+#Note: this variable has no effect when the ``$autoedit'' variable is set.
 #
 #  fcc_attach
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable controls whether or not attachments on outgoing messages
-#   are saved along with the main body of your message.
+#This variable controls whether or not attachments on outgoing messages are
+#saved along with the main body of your message.
 #
 #  fcc_clear
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When this variable is set, FCCs will be stored unencrypted and
-#   unsigned, even when the actual message is encrypted and/or signed.
-#   (PGP only)
+#When this variable is set, FCCs will be stored unencrypted and unsigned, even
+#when the actual message is encrypted and/or signed. (PGP only)
 #
 #  folder
 #
-#   Type: path
-#   Default: "~/Mail"
+#Type: path
+#Default: "~/Mail"
 #
-#   Specifies the default location of your mailboxes. A `+' or `=' at the
-#   beginning of a pathname will be expanded to the value of this
-#   variable. Note that if you change this variable from the default value
-#   you need to make sure that the assignment occurs before you use `+' or
-#   `=' for any other variables since expansion takes place during the
-#   `set' command.
+#Specifies the default location of your mailboxes. A `+' or `=' at the beginning
+#of a pathname will be expanded to the value of this variable. Note that if you
+#change this variable from the default value you need to make sure that the
+#assignment occurs before you use `+' or `=' for any other variables since
+#expansion takes place during the `set' command.
 #
 #  folder_format
 #
-#   Type: string
-#   Default: "%2C %t %N %F %2l %-8.8u %-8.8g %8s %d %f"
+#Type: string
+#Default: "%2C %t %N %F %2l %-8.8u %-8.8g %8s %d %f"
 #
-#   This variable allows you to customize the file browser display to your
-#   personal taste. This string is similar to ``$index_format'', but has
-#   its own set of printf()-like sequences:
+#This variable allows you to customize the file browser display to your personal
+#taste. This string is similar to ``$index_format'', but has its own set of
+#printf()-like sequences:
 #
-#   %C
-#          current file number
+#%C
 #
-#   %d
-#          date/time folder was last modified
+#    current file number
 #
-#   %f
-#          filename
+#%d
 #
-#   %F
-#          file permissions
+#    date/time folder was last modified
 #
-#   %g
-#          group name (or numeric gid, if missing)
+#%f
 #
-#   %l
-#          number of hard links
+#    filename
 #
-#   %N
-#          N if folder has new mail, blank otherwise
+#%F
 #
-#   %s
-#          size in bytes
+#    file permissions
 #
-#   %t
-#          * if the file is tagged, blank otherwise
+#%g
 #
-#   %u
-#          owner name (or numeric uid, if missing)
+#    group name (or numeric gid, if missing)
 #
-#   %>X
-#          right justify the rest of the string and pad with character "X"
+#%l
 #
-#   %|X
-#          pad to the end of the line with character "X"
+#    number of hard links
+#
+#%N
+#
+#    N if folder has new mail, blank otherwise
+#
+#%s
+#
+#    size in bytes
+#
+#%t
+#
+#    * if the file is tagged, blank otherwise
+#
+#%u
+#
+#    owner name (or numeric uid, if missing)
+#
+#%>X
+#
+#    right justify the rest of the string and pad with character "X"
+#
+#%|X
+#
+#    pad to the end of the line with character "X"
+#
+#%*X
+#
+#    soft-fill with character "X" as pad
+#
+#For an explanation of `soft-fill', see the ``$index_format'' documentation.
 #
 #  followup_to
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether or not the Mail-Followup-To header field is generated
-#   when sending mail. When set, Mutt will generate this field when you
-#   are replying to a known mailing list, specified with the ``subscribe''
-#   or ``lists'' commands.
+#Controls whether or not the Mail-Followup-To header field is generated when
+#sending mail. When set, Mutt will generate this field when you are replying to
+#a known mailing list, specified with the ``subscribe'' or ``lists'' commands.
 #
-#   This field has two purposes. First, preventing you from receiving
-#   duplicate copies of replies to messages which you send to mailing
-#   lists, and second, ensuring that you do get a reply separately for any
-#   messages sent to known lists to which you are not subscribed. The
-#   header will contain only the list's address for subscribed lists, and
-#   both the list address and your own email address for unsubscribed
-#   lists. Without this header, a group reply to your message sent to a
-#   subscribed list will be sent to both the list and your address,
-#   resulting in two copies of the same email for you.
+#This field has two purposes. First, preventing you from receiving duplicate
+#copies of replies to messages which you send to mailing lists, and second,
+#ensuring that you do get a reply separately for any messages sent to known
+#lists to which you are not subscribed. The header will contain only the list's
+#address for subscribed lists, and both the list address and your own email
+#address for unsubscribed lists. Without this header, a group reply to your
+#message sent to a subscribed list will be sent to both the list and your
+#address, resulting in two copies of the same email for you.
 #
 #  force_name
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable is similar to ``$save_name'', except that Mutt will
-#   store a copy of your outgoing message by the username of the address
-#   you are sending to even if that mailbox does not exist.
+#This variable is similar to ``$save_name'', except that Mutt will store a copy
+#of your outgoing message by the username of the address you are sending to even
+#if that mailbox does not exist.
 #
-#   Also see the ``$record'' variable.
+#Also see the ``$record'' variable.
 #
 #  forward_decode
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls the decoding of complex MIME messages into text/plain when
-#   forwarding a message. The message header is also RFC2047 decoded. This
-#   variable is only used, if ``$mime_forward'' is unset, otherwise
-#   ``$mime_forward_decode'' is used instead.
+#Controls the decoding of complex MIME messages into text/plain when forwarding
+#a message. The message header is also RFC2047 decoded. This variable is only
+#used, if ``$mime_forward'' is unset, otherwise ``$mime_forward_decode'' is used
+#instead.
 #
 #  forward_edit
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   This quadoption controls whether or not the user is automatically
-#   placed in the editor when forwarding messages. For those who always
-#   want to forward with no modification, use a setting of ``no''.
+#This quadoption controls whether or not the user is automatically placed in the
+#editor when forwarding messages. For those who always want to forward with no
+#modification, use a setting of ``no''.
 #
 #  forward_format
 #
-#   Type: string
-#   Default: "[%a: %s]"
+#Type: string
+#Default: "[%a: %s]"
 #
-#   This variable controls the default subject when forwarding a message.
-#   It uses the same format sequences as the ``$index_format'' variable.
+#This variable controls the default subject when forwarding a message. It uses
+#the same format sequences as the ``$index_format'' variable.
 #
 #  forward_quote
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set forwarded messages included in the main body of the message
-#   (when ``$mime_forward'' is unset) will be quoted using
-#   ``$indent_string''.
+#When set forwarded messages included in the main body of the message (when ``
+#$mime_forward'' is unset) will be quoted using ``$indent_string''.
 #
 #  from
 #
-#   Type: e-mail address
-#   Default: ""
+#Type: e-mail address
+#Default: ""
 #
-#   When set, this variable contains a default from address. It can be
-#   overridden using my_hdr (including from send-hooks) and
-#   ``$reverse_name''. This variable is ignored if ``$use_from'' is unset.
+#When set, this variable contains a default from address. It can be overridden
+#using my_hdr (including from send-hooks) and ``$reverse_name''. This variable
+#is ignored if ``$use_from'' is unset.
 #
-#   Defaults to the contents of the environment variable EMAIL.
+#Defaults to the contents of the environment variable EMAIL.
 #
 #  gecos_mask
 #
-#   Type: regular expression
-#   Default: "^[^,]*"
+#Type: regular expression
+#Default: "^[^,]*"
 #
-#   A regular expression used by mutt to parse the GECOS field of a
-#   password entry when expanding the alias. By default the regular
-#   expression is set to "^[^,]*" which will return the string up to the
-#   first "," encountered. If the GECOS field contains a string like
-#   "lastname, firstname" then you should set the gecos_mask=".*".
+#A regular expression used by mutt to parse the GECOS field of a password entry
+#when expanding the alias. By default the regular expression is set to "^[^,]*"
+#which will return the string up to the first "," encountered. If the GECOS
+#field contains a string like "lastname, firstname" then you should set the
+#gecos_mask=".*".
 #
-#   This can be useful if you see the following behavior: you address a
-#   e-mail to user ID stevef whose full name is Steve Franklin. If mutt
-#   expands stevef to "Franklin" stevef@foo.bar then you should set the
-#   gecos_mask to a regular expression that will match the whole name so
-#   mutt will expand "Franklin" to "Franklin, Steve".
+#This can be useful if you see the following behavior: you address a e-mail to
+#user ID stevef whose full name is Steve Franklin. If mutt expands stevef to
+#"Franklin" stevef@foo.bar then you should set the gecos_mask to a regular
+#expression that will match the whole name so mutt will expand "Franklin" to
+#"Franklin, Steve".
 #
 #  hdrs
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When unset, the header fields normally added by the ``my_hdr'' command
-#   are not created. This variable must be unset before composing a new
-#   message or replying in order to take effect. If set, the user defined
-#   header fields are added to every new message.
+#When unset, the header fields normally added by the ``my_hdr'' command are not
+#created. This variable must be unset before composing a new message or replying
+#in order to take effect. If set, the user defined header fields are added to
+#every new message.
 #
 #  header
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, this variable causes Mutt to include the header of the
-#   message you are replying to into the edit buffer. The ``$weed''
-#   setting applies.
+#When set, this variable causes Mutt to include the header of the message you
+#are replying to into the edit buffer. The ``$weed'' setting applies.
 #
 #  help
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, help lines describing the bindings for the major functions
-#   provided by each menu are displayed on the first line of the screen.
+#When set, help lines describing the bindings for the major functions provided
+#by each menu are displayed on the first line of the screen.
 #
-#   Note: The binding will not be displayed correctly if the function is
-#   bound to a sequence rather than a single keystroke. Also, the help
-#   line may not be updated if a binding is changed while Mutt is running.
-#   Since this variable is primarily aimed at new users, neither of these
-#   should present a major problem.
+#Note: The binding will not be displayed correctly if the function is bound to a
+#sequence rather than a single keystroke. Also, the help line may not be updated
+#if a binding is changed while Mutt is running. Since this variable is primarily
+#aimed at new users, neither of these should present a major problem.
 #
 #  hidden_host
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will skip the host name part of ``$hostname'' variable
-#   when adding the domain part to addresses. This variable does not
-#   affect the generation of Message-IDs, and it will not lead to the
-#   cut-off of first-level domains.
+#When set, mutt will skip the host name part of ``$hostname'' variable when
+#adding the domain part to addresses. This variable does not affect the
+#generation of Message-IDs, and it will not lead to the cut-off of first-level
+#domains.
 #
 #  hide_limited
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will not show the presence of messages that are hidden
-#   by limiting, in the thread tree.
+#When set, mutt will not show the presence of messages that are hidden by
+#limiting, in the thread tree.
 #
 #  hide_missing
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will not show the presence of missing messages in the
-#   thread tree.
+#When set, mutt will not show the presence of missing messages in the thread
+#tree.
 #
 #  hide_thread_subject
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will not show the subject of messages in the thread
-#   tree that have the same subject as their parent or closest previously
-#   displayed sibling.
+#When set, mutt will not show the subject of messages in the thread tree that
+#have the same subject as their parent or closest previously displayed sibling.
 #
 #  hide_top_limited
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will not show the presence of messages that are hidden
-#   by limiting, at the top of threads in the thread tree. Note that when
-#   $hide_limited is set, this option will have no effect.
+#When set, mutt will not show the presence of messages that are hidden by
+#limiting, at the top of threads in the thread tree. Note that when
+#$hide_limited is set, this option will have no effect.
 #
 #  hide_top_missing
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will not show the presence of missing messages at the
-#   top of threads in the thread tree. Note that when $hide_missing is
-#   set, this option will have no effect.
+#When set, mutt will not show the presence of missing messages at the top of
+#threads in the thread tree. Note that when $hide_missing is set, this option
+#will have no effect.
 #
 #  history
 #
-#   Type: number
-#   Default: 10
+#Type: number
+#Default: 10
 #
-#   This variable controls the size (in number of strings remembered) of
-#   the string history buffer. The buffer is cleared each time the
-#   variable is set.
+#This variable controls the size (in number of strings remembered) of the string
+#history buffer. The buffer is cleared each time the variable is set.
 #
 #  history_file
 #
-#   Type: path
-#   Default: "~/.mutthistory"
+#Type: path
+#Default: "~/.mutthistory"
 #
-#   The file in which Mutt will save its history.
+#The file in which Mutt will save its history.
 #
 #  honor_followup_to
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   This variable controls whether or not a Mail-Followup-To header is
-#   honored when group-replying to a message.
+#This variable controls whether or not a Mail-Followup-To header is honored when
+#group-replying to a message.
 #
 #  hostname
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Specifies the hostname to use after the ``@'' in local e-mail
-#   addresses. This overrides the compile time definition obtained from
-#   /etc/resolv.conf.
+#Specifies the fully-qualified hostname of the system mutt is running on
+#containing the host's name and the DNS domain it belongs to. It is used as the
+#domain part (after ``@'') for local email addresses as well as Message-Id
+#headers.
+#
+#Its value is determined at startup as follows: If the node's name as returned
+#by the uname(3) function contains the hostname and the domain, these are used
+#to construct $hostname. If there is no domain part returned, Mutt will look for
+#a ``domain'' or ``search'' line in /etc/resolv.conf to determine the domain.
+#Optionally, Mutt can be compiled with a fixed domain name in which case a
+#detected one is not used.
+#
+#Also see ``$use_domain'' and ``$hidden_host''.
 #
 #  ignore_linear_white_space
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This option replaces linear-white-space between encoded-word and *text
-#   to a single space to prevent the display of MIME-encoded ``Subject''
-#   field from being divided into multiple lines.
+#This option replaces linear-white-space between encoded-word and *text to a
+#single space to prevent the display of MIME-encoded ``Subject'' field from
+#being divided into multiple lines.
 #
 #  ignore_list_reply_to
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Affects the behaviour of the reply function when replying to messages
-#   from mailing lists. When set, if the ``Reply-To:'' field is set to the
-#   same value as the ``To:'' field, Mutt assumes that the ``Reply-To:''
-#   field was set by the mailing list to automate responses to the list,
-#   and will ignore this field. To direct a response to the mailing list
-#   when this option is set, use the list-reply function; group-reply will
-#   reply to both the sender and the list.
+#Affects the behaviour of the reply function when replying to messages from
+#mailing lists (as defined by the ``subscribe'' or ``lists'' commands). When
+#set, if the ``Reply-To:'' field is set to the same value as the ``To:'' field,
+#Mutt assumes that the ``Reply-To:'' field was set by the mailing list to
+#automate responses to the list, and will ignore this field. To direct a
+#response to the mailing list when this option is set, use the list-reply
+#function; group-reply will reply to both the sender and the list.
 #
 #  imap_authenticators
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This is a colon-delimited list of authentication methods mutt may
-#   attempt to use to log in to an IMAP server, in the order mutt should
-#   try them. Authentication methods are either 'login' or the right side
-#   of an IMAP 'AUTH=xxx' capability string, eg 'digest-md5', 'gssapi' or
-#   'cram-md5'. This parameter is case-insensitive. If this parameter is
-#   unset (the default) mutt will try all available methods, in order from
-#   most-secure to least-secure.
+#This is a colon-delimited list of authentication methods mutt may attempt to
+#use to log in to an IMAP server, in the order mutt should try them.
+#Authentication methods are either 'login' or the right side of an IMAP 'AUTH=
+#xxx' capability string, eg 'digest-md5', 'gssapi' or 'cram-md5'. This parameter
+#is case-insensitive. If this parameter is unset (the default) mutt will try all
+#available methods, in order from most-secure to least-secure.
 #
-#   Example: set imap_authenticators="gssapi:cram-md5:login"
+#Example: set imap_authenticators="gssapi:cram-md5:login"
 #
-#   Note: Mutt will only fall back to other authentication methods if the
-#   previous methods are unavailable. If a method is available but
-#   authentication fails, mutt will not connect to the IMAP server.
+#Note: Mutt will only fall back to other authentication methods if the previous
+#methods are unavailable. If a method is available but authentication fails,
+#mutt will not connect to the IMAP server.
 #
 #  imap_check_subscribed
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will fetch the set of subscribed folders from your
-#   server on connection, and add them to the set of mailboxes it polls
-#   for new mail. See also the ``mailboxes'' command.
+#When set, mutt will fetch the set of subscribed folders from your server on
+#connection, and add them to the set of mailboxes it polls for new mail. See
+#also the ``mailboxes'' command.
 #
 #  imap_delim_chars
 #
-#   Type: string
-#   Default: "/."
+#Type: string
+#Default: "/."
 #
-#   This contains the list of characters which you would like to treat as
-#   folder separators for displaying IMAP paths. In particular it helps in
-#   using the '=' shortcut for your folder variable.
+#This contains the list of characters which you would like to treat as folder
+#separators for displaying IMAP paths. In particular it helps in using the '='
+#shortcut for your folder variable.
 #
 #  imap_headers
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Mutt requests these header fields in addition to the default headers
-#   ("DATE FROM SUBJECT TO CC MESSAGE-ID REFERENCES CONTENT-TYPE
-#   CONTENT-DESCRIPTION IN-REPLY-TO REPLY-TO LINES X-LABEL") from IMAP
-#   servers before displaying the index menu. You may want to add more
-#   headers for spam detection. Note: This is a space separated list.
+#Mutt requests these header fields in addition to the default headers ("DATE
+#FROM SUBJECT TO CC MESSAGE-ID REFERENCES CONTENT-TYPE CONTENT-DESCRIPTION
+#IN-REPLY-TO REPLY-TO LINES X-LABEL") from IMAP servers before displaying the
+#index menu. You may want to add more headers for spam detection. Note: This is
+#a space separated list.
 #
 #  imap_idle
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will attempt to use the IMAP IDLE extension to check
-#   for new mail in the current mailbox. Some servers (dovecot was the
-#   inspiration for this option) react badly to mutt's implementation. If
-#   your connection seems to freeze up periodically, try unsetting this.
+#When set, mutt will attempt to use the IMAP IDLE extension to check for new
+#mail in the current mailbox. Some servers (dovecot was the inspiration for this
+#option) react badly to mutt's implementation. If your connection seems to
+#freeze up periodically, try unsetting this.
 #
 #  imap_keepalive
 #
-#   Type: number
-#   Default: 900
+#Type: number
+#Default: 900
 #
-#   This variable specifies the maximum amount of time in seconds that
-#   mutt will wait before polling open IMAP connections, to prevent the
-#   server from closing them before mutt has finished with them. The
-#   default is well within the RFC-specified minimum amount of time (30
-#   minutes) before a server is allowed to do this, but in practice the
-#   RFC does get violated every now and then. Reduce this number if you
-#   find yourself getting disconnected from your IMAP server due to
-#   inactivity.
+#This variable specifies the maximum amount of time in seconds that mutt will
+#wait before polling open IMAP connections, to prevent the server from closing
+#them before mutt has finished with them. The default is well within the
+#RFC-specified minimum amount of time (30 minutes) before a server is allowed to
+#do this, but in practice the RFC does get violated every now and then. Reduce
+#this number if you find yourself getting disconnected from your IMAP server due
+#to inactivity.
 #
 #  imap_list_subscribed
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable configures whether IMAP folder browsing will look for
-#   only subscribed folders or all folders. This can be toggled in the
-#   IMAP browser with the toggle-subscribed function.
+#This variable configures whether IMAP folder browsing will look for only
+#subscribed folders or all folders. This can be toggled in the IMAP browser with
+#the toggle-subscribed function.
 #
 #  imap_login
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Your login name on the IMAP server.
+#Your login name on the IMAP server.
 #
-#   This variable defaults to the value of imap_user.
+#This variable defaults to the value of imap_user.
 #
 #  imap_pass
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Specifies the password for your IMAP account. If unset, Mutt will
-#   prompt you for your password when you invoke the fetch-mail function.
-#   Warning: you should only use this option when you are on a fairly
-#   secure machine, because the superuser can read your muttrc even if you
-#   are the only one who can read the file.
+#Specifies the password for your IMAP account. If unset, Mutt will prompt you
+#for your password when you invoke the fetch-mail function. Warning: you should
+#only use this option when you are on a fairly secure machine, because the
+#superuser can read your muttrc even if you are the only one who can read the
+#file.
 #
 #  imap_passive
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will not open new IMAP connections to check for new
-#   mail. Mutt will only check for new mail over existing IMAP
-#   connections. This is useful if you don't want to be prompted to
-#   user/password pairs on mutt invocation, or if opening the connection
-#   is slow.
+#When set, mutt will not open new IMAP connections to check for new mail. Mutt
+#will only check for new mail over existing IMAP connections. This is useful if
+#you don't want to be prompted to user/password pairs on mutt invocation, or if
+#opening the connection is slow.
 #
 #  imap_peek
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will avoid implicitly marking your mail as read
-#   whenever you fetch a message from the server. This is generally a good
-#   thing, but can make closing an IMAP folder somewhat slower. This
-#   option exists to appease speed freaks.
+#When set, mutt will avoid implicitly marking your mail as read whenever you
+#fetch a message from the server. This is generally a good thing, but can make
+#closing an IMAP folder somewhat slower. This option exists to appease speed
+#freaks.
 #
 #  imap_servernoise
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will display warning messages from the IMAP server as
-#   error messages. Since these messages are often harmless, or generated
-#   due to configuration problems on the server which are out of the
-#   users' hands, you may wish to suppress them at some point.
+#When set, mutt will display warning messages from the IMAP server as error
+#messages. Since these messages are often harmless, or generated due to
+#configuration problems on the server which are out of the users' hands, you may
+#wish to suppress them at some point.
 #
 #  imap_user
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   The name of the user whose mail you intend to access on the IMAP
-#   server.
+#The name of the user whose mail you intend to access on the IMAP server.
 #
-#   This variable defaults to your user name on the local machine.
+#This variable defaults to your user name on the local machine.
 #
 #  implicit_autoview
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set to ``yes'', mutt will look for a mailcap entry with the
-#   copiousoutput flag set for every MIME attachment it doesn't have an
-#   internal viewer defined for. If such an entry is found, mutt will use
-#   the viewer defined in that entry to convert the body part to text
-#   form.
+#If set to ``yes'', mutt will look for a mailcap entry with the copiousoutput
+#flag set for every MIME attachment it doesn't have an internal viewer defined
+#for. If such an entry is found, mutt will use the viewer defined in that entry
+#to convert the body part to text form.
 #
 #  include
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether or not a copy of the message(s) you are replying to
-#   is included in your reply.
+#Controls whether or not a copy of the message(s) you are replying to is
+#included in your reply.
 #
 #  include_onlyfirst
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Controls whether or not Mutt includes only the first attachment of the
-#   message you are replying.
+#Controls whether or not Mutt includes only the first attachment of the message
+#you are replying.
 #
 #  indent_string
 #
-#   Type: string
-#   Default: "> "
+#Type: string
+#Default: "> "
 #
-#   Specifies the string to prepend to each line of text quoted in a
-#   message to which you are replying. You are strongly encouraged not to
-#   change this value, as it tends to agitate the more fanatical netizens.
+#Specifies the string to prepend to each line of text quoted in a message to
+#which you are replying. You are strongly encouraged not to change this value,
+#as it tends to agitate the more fanatical netizens.
+#
+#This option is a format string, please see the description of ``$index_format''
+#for supported printf()-style sequences.
 #
 #  index_format
 #
-#   Type: string
-#   Default: "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
+#Type: string
+#Default: "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
 #
-#   This variable allows you to customize the message index display to
-#   your personal taste.
+#This variable allows you to customize the message index display to your
+#personal taste.
 #
-#   ``Format strings'' are similar to the strings used in the ``C''
-#   function printf to format output (see the man page for more detail).
-#   The following sequences are defined in Mutt:
+#``Format strings'' are similar to the strings used in the ``C'' function printf
+#to format output (see the man page for more detail). The following sequences
+#are defined in Mutt:
 #
-#   %a
-#          address of the author
+#%a
 #
-#   %A
-#          reply-to address (if present; otherwise: address of author)
+#    address of the author
 #
-#   %b
-#          filename of the original message folder (think mailBox)
+#%A
 #
-#   %B
-#          the list to which the letter was sent, or else the folder name
-#          (%b).
+#    reply-to address (if present; otherwise: address of author)
 #
-#   %c
-#          number of characters (bytes) in the message
+#%b
 #
-#   %C
-#          current message number
+#    filename of the original message folder (think mailBox)
 #
-#   %d
-#          date and time of the message in the format specified by
-#          ``date_format'' converted to sender's time zone
+#%B
 #
-#   %D
-#          date and time of the message in the format specified by
-#          ``date_format'' converted to the local time zone
+#    the list to which the letter was sent, or else the folder name (%b).
 #
-#   %e
-#          current message number in thread
+#%c
 #
-#   %E
-#          number of messages in current thread
+#    number of characters (bytes) in the message
 #
-#   %f
-#          entire From: line (address + real name)
+#%C
 #
-#   %F
-#          author name, or recipient name if the message is from you
+#    current message number
 #
-#   %H
-#          spam attribute(s) of this message
+#%d
 #
-#   %i
-#          message-id of the current message
+#    date and time of the message in the format specified by ``date_format''
+#    converted to sender's time zone
 #
-#   %l
-#          number of lines in the message (does not work with maildir, mh,
-#          and possibly IMAP folders)
+#%D
 #
-#   %L
-#          If an address in the To or CC header field matches an address
-#          defined by the users ``subscribe'' command, this displays "To
-#          <list-name>", otherwise the same as %F.
+#    date and time of the message in the format specified by ``date_format''
+#    converted to the local time zone
 #
-#   %m
-#          total number of message in the mailbox
+#%e
 #
-#   %M
-#          number of hidden messages if the thread is collapsed.
+#    current message number in thread
 #
-#   %N
-#          message score
+#%E
 #
-#   %n
-#          author's real name (or address if missing)
+#    number of messages in current thread
 #
-#   %O
-#          (_O_riginal save folder) Where mutt would formerly have stashed
-#          the message: list name or recipient name if no list
+#%f
 #
-#   %s
-#          subject of the message
+#    sender (address + real name), either From: or Return-Path:
 #
-#   %S
-#          status of the message (N/D/d/!/r/*)
+#%F
 #
-#   %t
-#          `to:' field (recipients)
+#    author name, or recipient name if the message is from you
 #
-#   %T
-#          the appropriate character from the $to_chars string
+#%H
 #
-#   %u
-#          user (login) name of the author
+#    spam attribute(s) of this message
 #
-#   %v
-#          first name of the author, or the recipient if the message is
-#          from you
+#%i
 #
-#   %X
-#          number of attachments (please see the ``attachments'' section
-#          for possible speed effects)
+#    message-id of the current message
 #
-#   %y
-#          `x-label:' field, if present
+#%l
 #
-#   %Y
-#          `x-label' field, if present, and (1) not at part of a thread
-#          tree, (2) at the top of a thread, or (3) `x-label' is different
-#          from preceding message's `x-label'.
+#    number of lines in the message (does not work with maildir, mh, and
+#    possibly IMAP folders)
 #
-#   %Z
-#          message status flags
+#%L
 #
-#   %{fmt}
-#          the date and time of the message is converted to sender's time
-#          zone, and ``fmt'' is expanded by the library function
-#          ``strftime''; a leading bang disables locales
+#    If an address in the To or CC header field matches an address defined by
+#    the users ``subscribe'' command, this displays "To <list-name>", otherwise
+#    the same as %F.
 #
-#   %[fmt]
-#          the date and time of the message is converted to the local time
-#          zone, and ``fmt'' is expanded by the library function
-#          ``strftime''; a leading bang disables locales
+#%m
 #
-#   %(fmt)
-#          the local date and time when the message was received. ``fmt''
-#          is expanded by the library function ``strftime''; a leading
-#          bang disables locales
+#    total number of message in the mailbox
 #
-#   %<fmt>
-#          the current local time. ``fmt'' is expanded by the library
-#          function ``strftime''; a leading bang disables locales.
+#%M
 #
-#   %>X
-#          right justify the rest of the string and pad with character "X"
+#    number of hidden messages if the thread is collapsed.
 #
-#   %|X
-#          pad to the end of the line with character "X"
+#%N
 #
-#   See also: ``$to_chars''.
+#    message score
+#
+#%n
+#
+#    author's real name (or address if missing)
+#
+#%O
+#
+#    (_O_riginal save folder) Where mutt would formerly have stashed the
+#    message: list name or recipient name if no list
+#
+#%P
+#
+#    progress indicator for the builtin pager (how much of the file has been
+#    displayed)
+#
+#%s
+#
+#    subject of the message
+#
+#%S
+#
+#    status of the message (N/D/d/!/r/*)
+#
+#%t
+#
+#    `to:' field (recipients)
+#
+#%T
+#
+#    the appropriate character from the $to_chars string
+#
+#%u
+#
+#    user (login) name of the author
+#
+#%v
+#
+#    first name of the author, or the recipient if the message is from you
+#
+#%X
+#
+#    number of attachments (please see the ``attachments'' section for possible
+#    speed effects)
+#
+#%y
+#
+#    `x-label:' field, if present
+#
+#%Y
+#
+#    `x-label' field, if present, and (1) not at part of a thread tree, (2) at
+#    the top of a thread, or (3) `x-label' is different from preceding message's
+#    `x-label'.
+#
+#%Z
+#
+#    message status flags
+#
+#%{fmt}
+#
+#    the date and time of the message is converted to sender's time zone, and
+#    ``fmt'' is expanded by the library function ``strftime''; a leading bang
+#    disables locales
+#
+#%[fmt]
+#
+#    the date and time of the message is converted to the local time zone, and
+#    ``fmt'' is expanded by the library function ``strftime''; a leading bang
+#    disables locales
+#
+#%(fmt)
+#
+#    the local date and time when the message was received. ``fmt'' is expanded
+#    by the library function ``strftime''; a leading bang disables locales
+#
+#%<fmt>
+#
+#    the current local time. ``fmt'' is expanded by the library function
+#    ``strftime''; a leading bang disables locales.
+#
+#%>X
+#
+#    right justify the rest of the string and pad with character "X"
+#
+#%|X
+#
+#    pad to the end of the line with character "X"
+#
+#%*X
+#
+#    soft-fill with character "X" as pad
+#
+#`Soft-fill' deserves some explanation. Normal right-justification will print
+#everything to the left of the %>, displaying padding and the whatever lies to
+#the right only if there's room. By contrast, soft-fill gives priority to the
+#right-hand side, guaranteeing space to display it and showing padding only if
+#there's still room. If necessary, soft-fill will eat text leftwards to make
+#room for rightward text.
+#
+#Note that these expandos are supported in ``save-hook'', ``fcc-hook'' and ``
+#fcc-save-hook'', too.
+#
+#See also: ``$to_chars''.
 #
 #  ispell
 #
-#   Type: path
-#   Default: "ispell"
+#Type: path
+#Default: "ispell"
 #
-#   How to invoke ispell (GNU's spell-checking software).
+#How to invoke ispell (GNU's spell-checking software).
 #
 #  keep_flagged
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, read messages marked as flagged will not be moved from your
-#   spool mailbox to your ``$mbox'' mailbox, or as a result of a
-#   ``mbox-hook'' command.
+#If set, read messages marked as flagged will not be moved from your spool
+#mailbox to your ``$mbox'' mailbox, or as a result of a ``mbox-hook'' command.
 #
 #  locale
 #
-#   Type: string
-#   Default: "C"
+#Type: string
+#Default: "C"
 #
-#   The locale used by strftime(3) to format dates. Legal values are the
-#   strings your system accepts for the locale variable LC_TIME.
+#The locale used by strftime(3) to format dates. Legal values are the strings
+#your system accepts for the locale variable LC_TIME.
 #
 #  mail_check
 #
-#   Type: number
-#   Default: 5
+#Type: number
+#Default: 5
 #
-#   This variable configures how often (in seconds) mutt should look for
-#   new mail.
+#This variable configures how often (in seconds) mutt should look for new mail.
+#Also see the ``$timeout'' variable.
 #
 #  mailcap_path
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This variable specifies which files to consult when attempting to
-#   display MIME bodies not directly supported by Mutt.
+#This variable specifies which files to consult when attempting to display MIME
+#bodies not directly supported by Mutt.
 #
 #  mailcap_sanitize
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, mutt will restrict possible characters in mailcap % expandos
-#   to a well-defined set of safe characters. This is the safe setting,
-#   but we are not sure it doesn't break some more advanced MIME stuff.
+#If set, mutt will restrict possible characters in mailcap % expandos to a
+#well-defined set of safe characters. This is the safe setting, but we are not
+#sure it doesn't break some more advanced MIME stuff.
 #
-#   DON'T CHANGE THIS SETTING UNLESS YOU ARE REALLY SURE WHAT YOU ARE
-#   DOING!
+#DON'T CHANGE THIS SETTING UNLESS YOU ARE REALLY SURE WHAT YOU ARE DOING!
 #
 #  header_cache
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   The header_cache variable points to the header cache database. If
-#   header_cache points to a directory it will contain a header cache
-#   database per folder. If header_cache points to a file that file will
-#   be a single global header cache. By default it is unset so no header
-#   caching will be used.
+#The header_cache variable points to the header cache database. If header_cache
+#points to a directory it will contain a header cache database per folder. If
+#header_cache points to a file that file will be a single global header cache.
+#By default it is unset so no header caching will be used.
 #
 #  maildir_header_cache_verify
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Check for Maildir unaware programs other than mutt having modified
-#   maildir files when the header cache is in use. This incurs one stat(2)
-#   per message every time the folder is opened.
+#Check for Maildir unaware programs other than mutt having modified maildir
+#files when the header cache is in use. This incurs one stat(2) per message
+#every time the folder is opened.
 #
 #  header_cache_pagesize
 #
-#   Type: string
-#   Default: "16384"
+#Type: string
+#Default: "16384"
 #
-#   When mutt is compiled with either gdbm or bdb4 as the header cache
-#   backend, this option changes the database page size. Too large or too
-#   small values can waste space, memory, or CPU time. The default should
-#   be more or less optimal for most use cases.
+#When mutt is compiled with either gdbm or bdb4 as the header cache backend,
+#this option changes the database page size. Too large or too small values can
+#waste space, memory, or CPU time. The default should be more or less optimal
+#for most use cases.
 #
 #  header_cache_compress
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: yes
 #
-#   When mutt is compiled with qdbm as header cache backend, this option
-#   determines whether the database will be compressed. Compression
-#   results in database files roughly being one fifth of the usual
-#   diskspace, but the uncompression can result in a slower opening of
-#   cached folder(s).
+#When mutt is compiled with qdbm as header cache backend, this option determines
+#whether the database will be compressed. Compression results in database files
+#roughly being one fifth of the usual diskspace, but the uncompression can
+#result in a slower opening of cached folder(s).
 #
 #  maildir_trash
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, messages marked as deleted will be saved with the maildir
-#   (T)rashed flag instead of unlinked. NOTE: this only applies to
-#   maildir-style mailboxes. Setting it will have no effect on other
-#   mailbox types.
+#If set, messages marked as deleted will be saved with the maildir (T)rashed
+#flag instead of unlinked. NOTE: this only applies to maildir-style mailboxes.
+#Setting it will have no effect on other mailbox types.
 #
 #  mark_old
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether or not mutt marks new unread messages as old if you
-#   exit a mailbox without reading them. With this option set, the next
-#   time you start mutt, the messages will show up with an "O" next to
-#   them in the index menu, indicating that they are old.
+#Controls whether or not mutt marks newunread messages as old if you exit a
+#mailbox without reading them. With this option set, the next time you start
+#mutt, the messages will show up with an "O" next to them in the index menu,
+#indicating that they are old.
 #
 #  markers
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls the display of wrapped lines in the internal pager. If set, a
-#   ``+'' marker is displayed at the beginning of wrapped lines. Also see
-#   the ``$smart_wrap'' variable.
+#Controls the display of wrapped lines in the internal pager. If set, a ``+''
+#marker is displayed at the beginning of wrapped lines. Also see the ``
+#$smart_wrap'' variable.
 #
 #  mask
 #
-#   Type: regular expression
-#   Default: "!^\.[^.]"
+#Type: regular expression
+#Default: "!^\.[^.]"
 #
-#   A regular expression used in the file browser, optionally preceded by
-#   the not operator ``!''. Only files whose names match this mask will be
-#   shown. The match is always case-sensitive.
+#A regular expression used in the file browser, optionally preceded by the not
+#operator ``!''. Only files whose names match this mask will be shown. The match
+#is always case-sensitive.
 #
 #  mbox
 #
-#   Type: path
-#   Default: "~/mbox"
+#Type: path
+#Default: "~/mbox"
 #
-#   This specifies the folder into which read mail in your ``$spoolfile''
-#   folder will be appended.
+#This specifies the folder into which read mail in your ``$spoolfile'' folder
+#will be appended.
 #
 #  mbox_type
 #
-#   Type: folder magic
-#   Default: mbox
+#Type: folder magic
+#Default: mbox
 #
-#   The default mailbox type used when creating new folders. May be any of
-#   mbox, MMDF, MH and Maildir.
+#The default mailbox type used when creating new folders. May be any of mbox,
+#MMDF, MH and Maildir.
 #
 #  metoo
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If unset, Mutt will remove your address (see the ``alternates''
-#   command) from the list of recipients when replying to a message.
+#If unset, Mutt will remove your address (see the ``alternates'' command) from
+#the list of recipients when replying to a message.
 #
 #  menu_context
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   This variable controls the number of lines of context that are given
-#   when scrolling through menus. (Similar to ``$pager_context''.)
+#This variable controls the number of lines of context that are given when
+#scrolling through menus. (Similar to ``$pager_context''.)
 #
 #  menu_move_off
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When unset, the bottom entry of menus will never scroll up past the
-#   bottom of the screen, unless there are less entries than lines. When
-#   set, the bottom entry may move off the bottom.
+#When unset, the bottom entry of menus will never scroll up past the bottom of
+#the screen, unless there are less entries than lines. When set, the bottom
+#entry may move off the bottom.
 #
 #  menu_scroll
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, menus will be scrolled up or down one line when you attempt
-#   to move across a screen boundary. If unset, the screen is cleared and
-#   the next or previous page of the menu is displayed (useful for slow
-#   links to avoid many redraws).
+#When set, menus will be scrolled up or down one line when you attempt to move
+#across a screen boundary. If unset, the screen is cleared and the next or
+#previous page of the menu is displayed (useful for slow links to avoid many
+#redraws).
 #
 #  meta_key
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, forces Mutt to interpret keystrokes with the high bit (bit 8)
-#   set as if the user had pressed the ESC key and whatever key remains
-#   after having the high bit removed. For example, if the key pressed has
-#   an ASCII value of 0xf8, then this is treated as if the user had
-#   pressed ESC then ``x''. This is because the result of removing the
-#   high bit from ``0xf8'' is ``0x78'', which is the ASCII character
-#   ``x''.
+#If set, forces Mutt to interpret keystrokes with the high bit (bit 8) set as if
+#the user had pressed the ESC key and whatever key remains after having the high
+#bit removed. For example, if the key pressed has an ASCII value of 0xf8, then
+#this is treated as if the user had pressed ESC then ``x''. This is because the
+#result of removing the high bit from ``0xf8'' is ``0x78'', which is the ASCII
+#character ``x''.
 #
 #  mh_purge
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When unset, mutt will mimic mh's behaviour and rename deleted messages
-#   to ,<old file name> in mh folders instead of really deleting them. If
-#   the variable is set, the message files will simply be deleted.
+#When unset, mutt will mimic mh's behaviour and rename deleted messages to ,<old
+#file name> in mh folders instead of really deleting them. If the variable is
+#set, the message files will simply be deleted.
 #
 #  mh_seq_flagged
 #
-#   Type: string
-#   Default: "flagged"
+#Type: string
+#Default: "flagged"
 #
-#   The name of the MH sequence used for flagged messages.
+#The name of the MH sequence used for flagged messages.
 #
 #  mh_seq_replied
 #
-#   Type: string
-#   Default: "replied"
+#Type: string
+#Default: "replied"
 #
-#   The name of the MH sequence used to tag replied messages.
+#The name of the MH sequence used to tag replied messages.
 #
 #  mh_seq_unseen
 #
-#   Type: string
-#   Default: "unseen"
+#Type: string
+#Default: "unseen"
 #
-#   The name of the MH sequence used for unseen messages.
+#The name of the MH sequence used for unseen messages.
 #
 #  mime_forward
 #
-#   Type: quadoption
-#   Default: no
+#Type: quadoption
+#Default: no
 #
-#   When set, the message you are forwarding will be attached as a
-#   separate MIME part instead of included in the main body of the
-#   message. This is useful for forwarding MIME messages so the receiver
-#   can properly view the message as it was delivered to you. If you like
-#   to switch between MIME and not MIME from mail to mail, set this
-#   variable to ask-no or ask-yes.
+#When set, the message you are forwarding will be attached as a separate MIME
+#part instead of included in the main body of the message. This is useful for
+#forwarding MIME messages so the receiver can properly view the message as it
+#was delivered to you. If you like to switch between MIME and not MIME from mail
+#to mail, set this variable to ask-no or ask-yes.
 #
-#   Also see ``$forward_decode'' and ``$mime_forward_decode''.
+#Also see ``$forward_decode'' and ``$mime_forward_decode''.
 #
 #  mime_forward_decode
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Controls the decoding of complex MIME messages into text/plain when
-#   forwarding a message while ``$mime_forward'' is set. Otherwise
-#   ``$forward_decode'' is used instead.
+#Controls the decoding of complex MIME messages into text/plain when forwarding
+#a message while ``$mime_forward'' is set. Otherwise ``$forward_decode'' is used
+#instead.
 #
 #  mime_forward_rest
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   When forwarding multiple attachments of a MIME message from the
-#   recvattach menu, attachments which cannot be decoded in a reasonable
-#   manner will be attached to the newly composed message if this option
-#   is set.
+#When forwarding multiple attachments of a MIME message from the recvattach
+#menu, attachments which cannot be decoded in a reasonable manner will be
+#attached to the newly composed message if this option is set.
 #
 #  mix_entry_format
 #
-#   Type: string
-#   Default: "%4n %c %-16s %a"
+#Type: string
+#Default: "%4n %c %-16s %a"
 #
-#   This variable describes the format of a remailer line on the mixmaster
-#   chain selection screen. The following printf-like sequences are
-#   supported:
+#This variable describes the format of a remailer line on the mixmaster chain
+#selection screen. The following printf-like sequences are supported:
 #
-#   %n
-#          The running number on the menu.
+#%n
 #
-#   %c
-#          Remailer capabilities.
+#    The running number on the menu.
 #
-#   %s
-#          The remailer's short name.
+#%c
 #
-#   %a
-#          The remailer's e-mail address.
+#    Remailer capabilities.
+#
+#%s
+#
+#    The remailer's short name.
+#
+#%a
+#
+#    The remailer's e-mail address.
 #
 #  mixmaster
 #
-#   Type: path
-#   Default: "mixmaster"
+#Type: path
+#Default: "mixmaster"
 #
-#   This variable contains the path to the Mixmaster binary on your
-#   system. It is used with various sets of parameters to gather the list
-#   of known remailers, and to finally send a message through the
-#   mixmaster chain.
+#This variable contains the path to the Mixmaster binary on your system. It is
+#used with various sets of parameters to gather the list of known remailers, and
+#to finally send a message through the mixmaster chain.
 #
 #  move
 #
-#   Type: quadoption
-#   Default: ask-no
+#Type: quadoption
+#Default: ask-no
 #
-#   Controls whether or not Mutt will move read messages from your spool
-#   mailbox to your ``$mbox'' mailbox, or as a result of a ``mbox-hook''
-#   command.
+#Controls whether or not Mutt will move read messages from your spool mailbox to
+#your ``$mbox'' mailbox, or as a result of a ``mbox-hook'' command.
 #
 #  message_cachedir
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   Set this to a directory and mutt will cache copies of messages from
-#   your IMAP and POP servers here. You are free to remove entries at any
-#   time, for instance if stale entries accumulate because you have
-#   deleted messages with another mail client.
+#Set this to a directory and mutt will cache copies of messages from your IMAP
+#and POP servers here. You are free to remove entries at any time, for instance
+#if stale entries accumulate because you have deleted messages with another mail
+#client.
+#
+#  message_cache_clean
+#
+#Type: boolean
+#Default: no
+#
+#If set, mutt will clean out obsolete entries from the cache when the mailbox is
+#synchronized. You probably only want to set it every once in a while, since it
+#can be a little slow.
 #
 #  message_format
 #
-#   Type: string
-#   Default: "%s"
+#Type: string
+#Default: "%s"
 #
-#   This is the string displayed in the ``attachment'' menu for
-#   attachments of type message/rfc822. For a full listing of defined
-#   printf()-like sequences see the section on ``$index_format''.
+#This is the string displayed in the ``attachment'' menu for attachments of type
+#message/rfc822. For a full listing of defined printf()-like sequences see the
+#section on ``$index_format''.
 #
 #  narrow_tree
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable, when set, makes the thread tree narrower, allowing
-#   deeper threads to fit on the screen.
+#This variable, when set, makes the thread tree narrower, allowing deeper
+#threads to fit on the screen.
 #
 #  net_inc
 #
-#   Type: number
-#   Default: 10
+#Type: number
+#Default: 10
 #
-#   Operations that expect to transfer a large amount of data over the
-#   network will update their progress every net_inc kilobytes. If set to
-#   0, no progress messages will be displayed.
+#Operations that expect to transfer a large amount of data over the network will
+#update their progress every net_inc kilobytes. If set to 0, no progress
+#messages will be displayed.
 #
-#   See also ``$read_inc'' and ``$write_inc''.
+#See also ``$read_inc'' and ``$write_inc''.
 #
 #  pager
 #
-#   Type: path
-#   Default: "builtin"
+#Type: path
+#Default: "builtin"
 #
-#   This variable specifies which pager you would like to use to view
-#   messages. builtin means to use the builtin pager, otherwise this
-#   variable should specify the pathname of the external pager you would
-#   like to use.
+#This variable specifies which pager you would like to use to view messages.
+#builtin means to use the builtin pager, otherwise this variable should specify
+#the pathname of the external pager you would like to use.
 #
-#   Using an external pager may have some disadvantages: Additional
-#   keystrokes are necessary because you can't call mutt functions
-#   directly from the pager, and screen resizes cause lines longer than
-#   the screen width to be badly formatted in the help menu.
+#Using an external pager may have some disadvantages: Additional keystrokes are
+#necessary because you can't call mutt functions directly from the pager, and
+#screen resizes cause lines longer than the screen width to be badly formatted
+#in the help menu.
 #
 #  pager_context
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   This variable controls the number of lines of context that are given
-#   when displaying the next or previous page in the internal pager. By
-#   default, Mutt will display the line after the last one on the screen
-#   at the top of the next page (0 lines of context).
+#This variable controls the number of lines of context that are given when
+#displaying the next or previous page in the internal pager. By default, Mutt
+#will display the line after the last one on the screen at the top of the next
+#page (0 lines of context).
 #
 #  pager_format
 #
-#   Type: string
-#   Default: "-%Z- %C/%m: %-20.20n   %s"
+#Type: string
+#Default: "-%Z- %C/%m: %-20.20n %s%* -- (%P)"
 #
-#   This variable controls the format of the one-line message ``status''
-#   displayed before each message in either the internal or an external
-#   pager. The valid sequences are listed in the ``$index_format''
-#   section.
+#This variable controls the format of the one-line message ``status'' displayed
+#before each message in either the internal or an external pager. The valid
+#sequences are listed in the ``$index_format'' section.
 #
 #  pager_index_lines
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   Determines the number of lines of a mini-index which is shown when in
-#   the pager. The current message, unless near the top or bottom of the
-#   folder, will be roughly one third of the way down this mini-index,
-#   giving the reader the context of a few messages before and after the
-#   message. This is useful, for example, to determine how many messages
-#   remain to be read in the current thread. One of the lines is reserved
-#   for the status bar from the index, so a pager_index_lines of 6 will
-#   only show 5 lines of the actual index. A value of 0 results in no
-#   index being shown. If the number of messages in the current folder is
-#   less than pager_index_lines, then the index will only use as many
-#   lines as it needs.
+#Determines the number of lines of a mini-index which is shown when in the
+#pager. The current message, unless near the top or bottom of the folder, will
+#be roughly one third of the way down this mini-index, giving the reader the
+#context of a few messages before and after the message. This is useful, for
+#example, to determine how many messages remain to be read in the current
+#thread. One of the lines is reserved for the status bar from the index, so a
+#pager_index_lines of 6 will only show 5 lines of the actual index. A value of 0
+#results in no index being shown. If the number of messages in the current
+#folder is less than pager_index_lines, then the index will only use as many
+#lines as it needs.
 #
 #  pager_stop
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, the internal-pager will not move to the next message when
-#   you are at the end of a message and invoke the next-page function.
+#When set, the internal-pager will not move to the next message when you are at
+#the end of a message and invoke the next-page function.
 #
 #  crypt_autosign
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Setting this variable will cause Mutt to always attempt to
-#   cryptographically sign outgoing messages. This can be overridden by
-#   use of the pgp-menu, when signing is not required or encryption is
-#   requested as well. If ``$smime_is_default'' is set, then OpenSSL is
-#   used instead to create S/MIME messages and settings can be overridden
-#   by use of the smime-menu. (Crypto only)
+#Setting this variable will cause Mutt to always attempt to cryptographically
+#sign outgoing messages. This can be overridden by use of the pgp-menu, when
+#signing is not required or encryption is requested as well. If ``
+#$smime_is_default'' is set, then OpenSSL is used instead to create S/MIME
+#messages and settings can be overridden by use of the smime-menu. (Crypto only)
 #
 #  crypt_autoencrypt
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Setting this variable will cause Mutt to always attempt to PGP encrypt
-#   outgoing messages. This is probably only useful in connection to the
-#   send-hook command. It can be overridden by use of the pgp-menu, when
-#   encryption is not required or signing is requested as well. IF
-#   ``$smime_is_default'' is set, then OpenSSL is used instead to create
-#   S/MIME messages and settings can be overridden by use of the
-#   smime-menu. (Crypto only)
+#Setting this variable will cause Mutt to always attempt to PGP encrypt outgoing
+#messages. This is probably only useful in connection to the send-hook command.
+#It can be overridden by use of the pgp-menu, when encryption is not required or
+#signing is requested as well. IF ``$smime_is_default'' is set, then OpenSSL is
+#used instead to create S/MIME messages and settings can be overridden by use of
+#the smime-menu. (Crypto only)
 #
 #  pgp_ignore_subkeys
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Setting this variable will cause Mutt to ignore OpenPGP subkeys.
-#   Instead, the principal key will inherit the subkeys' capabilities.
-#   Unset this if you want to play interesting key selection games. (PGP
-#   only)
+#Setting this variable will cause Mutt to ignore OpenPGP subkeys. Instead, the
+#principal key will inherit the subkeys' capabilities. Unset this if you want to
+#play interesting key selection games. (PGP only)
 #
 #  crypt_replyencrypt
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, automatically PGP or OpenSSL encrypt replies to messages which
-#   are encrypted. (Crypto only)
+#If set, automatically PGP or OpenSSL encrypt replies to messages which are
+#encrypted. (Crypto only)
 #
 #  crypt_replysign
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, automatically PGP or OpenSSL sign replies to messages which
-#   are signed.
+#If set, automatically PGP or OpenSSL sign replies to messages which are signed.
 #
-#   Note: this does not work on messages that are encrypted and signed!
-#   (Crypto only)
+#Note: this does not work on messages that are encrypted and signed! (Crypto
+#only)
 #
 #  crypt_replysignencrypted
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, automatically PGP or OpenSSL sign replies to messages which
-#   are encrypted. This makes sense in combination with
-#   ``$crypt_replyencrypt'', because it allows you to sign all messages
-#   which are automatically encrypted. This works around the problem noted
-#   in ``$crypt_replysign'', that mutt is not able to find out whether an
-#   encrypted message is also signed. (Crypto only)
+#If set, automatically PGP or OpenSSL sign replies to messages which are
+#encrypted. This makes sense in combination with ``$crypt_replyencrypt'',
+#because it allows you to sign all messages which are automatically encrypted.
+#This works around the problem noted in ``$crypt_replysign'', that mutt is not
+#able to find out whether an encrypted message is also signed. (Crypto only)
 #
 #  crypt_timestamp
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, mutt will include a time stamp in the lines surrounding PGP or
-#   S/MIME output, so spoofing such lines is more difficult. If you are
-#   using colors to mark these lines, and rely on these, you may unset
-#   this setting. (Crypto only)
+#If set, mutt will include a time stamp in the lines surrounding PGP or S/MIME
+#output, so spoofing such lines is more difficult. If you are using colors to
+#mark these lines, and rely on these, you may unset this setting. (Crypto only)
 #
 #  pgp_use_gpg_agent
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, mutt will use a possibly-running gpg-agent process. (PGP only)
+#If set, mutt will use a possibly-running gpg-agent process. (PGP only)
 #
 #  crypt_verify_sig
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   If ``yes'', always attempt to verify PGP or S/MIME signatures. If
-#   ``ask'', ask whether or not to verify the signature. If ``no'', never
-#   attempt to verify cryptographic signatures. (Crypto only)
+#If ``yes'', always attempt to verify PGP or S/MIME signatures. If ``ask'', ask
+#whether or not to verify the signature. If ``no'', never attempt to verify
+#cryptographic signatures. (Crypto only)
 #
 #  smime_is_default
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   The default behaviour of mutt is to use PGP on all
-#   auto-sign/encryption operations. To override and to use OpenSSL
-#   instead this must be set. However, this has no effect while replying,
-#   since mutt will automatically select the same application that was
-#   used to sign/encrypt the original message. (Note that this variable
-#   can be overridden by unsetting $crypt_autosmime.) (S/MIME only)
+#The default behaviour of mutt is to use PGP on all auto-sign/encryption
+#operations. To override and to use OpenSSL instead this must be set. However,
+#this has no effect while replying, since mutt will automatically select the
+#same application that was used to sign/encrypt the original message. (Note that
+#this variable can be overridden by unsetting $crypt_autosmime.) (S/MIME only)
 #
 #  smime_ask_cert_label
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This flag controls whether you want to be asked to enter a label for a
-#   certificate about to be added to the database or not. It is set by
-#   default. (S/MIME only)
+#This flag controls whether you want to be asked to enter a label for a
+#certificate about to be added to the database or not. It is set by default. (S/
+#MIME only)
 #
 #  smime_decrypt_use_default_key
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set (default) this tells mutt to use the default key for
-#   decryption. Otherwise, if manage multiple certificate-key-pairs, mutt
-#   will try to use the mailbox-address to determine the key to use. It
-#   will ask you to supply a key, if it can't find one. (S/MIME only)
+#If set (default) this tells mutt to use the default key for decryption.
+#Otherwise, if manage multiple certificate-key-pairs, mutt will try to use the
+#mailbox-address to determine the key to use. It will ask you to supply a key,
+#if it can't find one. (S/MIME only)
 #
 #  pgp_entry_format
 #
-#   Type: string
-#   Default: "%4n %t%f %4l/0x%k %-4a %2c %u"
+#Type: string
+#Default: "%4n %t%f %4l/0x%k %-4a %2c %u"
 #
-#   This variable allows you to customize the PGP key selection menu to
-#   your personal taste. This string is similar to ``$index_format'', but
-#   has its own set of printf()-like sequences:
+#This variable allows you to customize the PGP key selection menu to your
+#personal taste. This string is similar to ``$index_format'', but has its own
+#set of printf()-like sequences:
 #
-#   %n
-#          number
+#%n
 #
-#   %k
-#          key id
+#    number
 #
-#   %u
-#          user id
+#%k
 #
-#   %a
-#          algorithm
+#    key id
 #
-#   %l
-#          key length
+#%u
 #
-#   %f
-#          flags
+#    user id
 #
-#   %c
-#          capabilities
+#%a
 #
-#   %t
-#          trust/validity of the key-uid association
+#    algorithm
 #
-#   %[<s>]
-#          date of the key where <s> is an strftime(3) expression
+#%l
 #
-#   (PGP only)
+#    key length
+#
+#%f
+#
+#    flags
+#
+#%c
+#
+#    capabilities
+#
+#%t
+#
+#    trust/validity of the key-uid association
+#
+#%[<s>]
+#
+#    date of the key where <s> is an strftime(3) expression
+#
+#(PGP only)
 #
 #  pgp_good_sign
 #
-#   Type: regular expression
-#   Default: ""
+#Type: regular expression
+#Default: ""
 #
-#   If you assign a text to this variable, then a PGP signature is only
-#   considered verified if the output from $pgp_verify_command contains
-#   the text. Use this variable if the exit code from the command is 0
-#   even for bad signatures. (PGP only)
+#If you assign a text to this variable, then a PGP signature is only considered
+#verified if the output from $pgp_verify_command contains the text. Use this
+#variable if the exit code from the command is 0 even for bad signatures. (PGP
+#only)
 #
 #  pgp_check_exit
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, mutt will check the exit code of the PGP subprocess when
-#   signing or encrypting. A non-zero exit code means that the subprocess
-#   failed. (PGP only)
+#If set, mutt will check the exit code of the PGP subprocess when signing or
+#encrypting. A non-zero exit code means that the subprocess failed. (PGP only)
 #
 #  pgp_long_ids
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, use 64 bit PGP key IDs. Unset uses the normal 32 bit Key IDs.
-#   (PGP only)
+#If set, use 64 bit PGP key IDs. Unset uses the normal 32 bit Key IDs. (PGP
+#only)
 #
 #  pgp_retainable_sigs
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, signed and encrypted messages will consist of nested
-#   multipart/signed and multipart/encrypted body parts.
+#If set, signed and encrypted messages will consist of nested multipart/signed
+#and multipart/encrypted body parts.
 #
-#   This is useful for applications like encrypted and signed mailing
-#   lists, where the outer layer (multipart/encrypted) can be easily
-#   removed, while the inner multipart/signed part is retained. (PGP only)
+#This is useful for applications like encrypted and signed mailing lists, where
+#the outer layer (multipart/encrypted) can be easily removed, while the inner
+#multipart/signed part is retained. (PGP only)
 #
 #  pgp_autoinline
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This option controls whether Mutt generates old-style inline
-#   (traditional) PGP encrypted or signed messages under certain
-#   circumstances. This can be overridden by use of the pgp-menu, when
-#   inline is not required.
+#This option controls whether Mutt generates old-style inline (traditional) PGP
+#encrypted or signed messages under certain circumstances. This can be
+#overridden by use of the pgp-menu, when inline is not required.
 #
-#   Note that Mutt might automatically use PGP/MIME for messages which
-#   consist of more than a single MIME part. Mutt can be configured to ask
-#   before sending PGP/MIME messages when inline (traditional) would not
-#   work. See also: ``$pgp_mime_auto''.
+#Note that Mutt might automatically use PGP/MIME for messages which consist of
+#more than a single MIME part. Mutt can be configured to ask before sending PGP/
+#MIME messages when inline (traditional) would not work. See also: ``
+#$pgp_mime_auto''.
 #
-#   Also note that using the old-style PGP message format is strongly
-#   deprecated. (PGP only)
+#Also note that using the old-style PGP message format is stronglydeprecated.
+#(PGP only)
 #
 #  pgp_replyinline
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Setting this variable will cause Mutt to always attempt to create an
-#   inline (traditional) message when replying to a message which is PGP
-#   encrypted/signed inline. This can be overridden by use of the
-#   pgp-menu, when inline is not required. This option does not
-#   automatically detect if the (replied-to) message is inline; instead it
-#   relies on Mutt internals for previously checked/flagged messages.
+#Setting this variable will cause Mutt to always attempt to create an inline
+#(traditional) message when replying to a message which is PGP encrypted/signed
+#inline. This can be overridden by use of the pgp-menu, when inline is not
+#required. This option does not automatically detect if the (replied-to) message
+#is inline; instead it relies on Mutt internals for previously checked/flagged
+#messages.
 #
-#   Note that Mutt might automatically use PGP/MIME for messages which
-#   consist of more than a single MIME part. Mutt can be configured to ask
-#   before sending PGP/MIME messages when inline (traditional) would not
-#   work. See also: ``$pgp_mime_auto''.
+#Note that Mutt might automatically use PGP/MIME for messages which consist of
+#more than a single MIME part. Mutt can be configured to ask before sending PGP/
+#MIME messages when inline (traditional) would not work. See also: ``
+#$pgp_mime_auto''.
 #
-#   Also note that using the old-style PGP message format is strongly
-#   deprecated. (PGP only)
+#Also note that using the old-style PGP message format is stronglydeprecated.
+#(PGP only)
 #
 #  pgp_show_unusable
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, mutt will display non-usable keys on the PGP key selection
-#   menu. This includes keys which have been revoked, have expired, or
-#   have been marked as ``disabled'' by the user. (PGP only)
+#If set, mutt will display non-usable keys on the PGP key selection menu. This
+#includes keys which have been revoked, have expired, or have been marked as
+#``disabled'' by the user. (PGP only)
 #
 #  pgp_sign_as
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   If you have more than one key pair, this option allows you to specify
-#   which of your private keys to use. It is recommended that you use the
-#   keyid form to specify your key (e.g., ``0x00112233''). (PGP only)
+#If you have more than one key pair, this option allows you to specify which of
+#your private keys to use. It is recommended that you use the keyid form to
+#specify your key (e.g., ``0x00112233''). (PGP only)
 #
 #  pgp_strict_enc
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, Mutt will automatically encode PGP/MIME signed messages as
-#   quoted-printable. Please note that unsetting this variable may lead to
-#   problems with non-verifyable PGP signatures, so only change this if
-#   you know what you are doing. (PGP only)
+#If set, Mutt will automatically encode PGP/MIME signed messages as
+#quoted-printable. Please note that unsetting this variable may lead to problems
+#with non-verifyable PGP signatures, so only change this if you know what you
+#are doing. (PGP only)
 #
 #  pgp_timeout
 #
-#   Type: number
-#   Default: 300
+#Type: number
+#Default: 300
 #
-#   The number of seconds after which a cached passphrase will expire if
-#   not used. (PGP only)
+#The number of seconds after which a cached passphrase will expire if not used.
+#(PGP only)
 #
 #  pgp_sort_keys
 #
-#   Type: sort order
-#   Default: address
+#Type: sort order
+#Default: address
 #
-#   Specifies how the entries in the `pgp keys' menu are sorted. The
-#   following are legal values:
+#Specifies how the entries in the `pgp keys' menu are sorted. The following are
+#legal values:
 #
-#   address
-#          sort alphabetically by user id
+#address
 #
-#   keyid
-#          sort alphabetically by key id
+#    sort alphabetically by user id
 #
-#   date
-#          sort by key creation date
+#keyid
 #
-#   trust
-#          sort by the trust of the key
+#    sort alphabetically by key id
 #
-#   If you prefer reverse order of the above values, prefix it with
-#   `reverse-'. (PGP only)
+#date
+#
+#    sort by key creation date
+#
+#trust
+#
+#    sort by the trust of the key
+#
+#If you prefer reverse order of the above values, prefix it with `reverse-'.
+#(PGP only)
 #
 #  pgp_mime_auto
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   This option controls whether Mutt will prompt you for automatically
-#   sending a (signed/encrypted) message using PGP/MIME when inline
-#   (traditional) fails (for any reason).
+#This option controls whether Mutt will prompt you for automatically sending a
+#(signed/encrypted) message using PGP/MIME when inline (traditional) fails (for
+#any reason).
 #
-#   Also note that using the old-style PGP message format is strongly
-#   deprecated. (PGP only)
+#Also note that using the old-style PGP message format is stronglydeprecated.
+#(PGP only)
 #
 #  pgp_auto_decode
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, mutt will automatically attempt to decrypt traditional PGP
-#   messages whenever the user performs an operation which ordinarily
-#   would result in the contents of the message being operated on. For
-#   example, if the user displays a pgp-traditional message which has not
-#   been manually checked with the check-traditional-pgp function, mutt
-#   will automatically check the message for traditional pgp.
+#If set, mutt will automatically attempt to decrypt traditional PGP messages
+#whenever the user performs an operation which ordinarily would result in the
+#contents of the message being operated on. For example, if the user displays a
+#pgp-traditional message which has not been manually checked with the
+#check-traditional-pgp function, mutt will automatically check the message for
+#traditional pgp.
 #
 #  pgp_decode_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This format strings specifies a command which is used to decode
-#   application/pgp attachments.
+#This format strings specifies a command which is used to decode application/pgp
+#attachments.
 #
-#   The PGP command formats have their own set of printf-like sequences:
+#The PGP command formats have their own set of printf-like sequences:
 #
-#   %p
-#          Expands to PGPPASSFD=0 when a pass phrase is needed, to an
-#          empty string otherwise. Note: This may be used with a %?
-#          construct.
+#%p
 #
-#   %f
-#          Expands to the name of a file containing a message.
+#    Expands to PGPPASSFD=0 when a pass phrase is needed, to an empty string
+#    otherwise. Note: This may be used with a %? construct.
 #
-#   %s
-#          Expands to the name of a file containing the signature part of
-#          a multipart/signed attachment when verifying it.
+#%f
 #
-#   %a
-#          The value of $pgp_sign_as.
+#    Expands to the name of a file containing a message.
 #
-#   %r
-#          One or more key IDs.
+#%s
 #
-#   For examples on how to configure these formats for the various
-#   versions of PGP which are floating around, see the pgp*.rc and gpg.rc
-#   files in the samples/ subdirectory which has been installed on your
-#   system alongside the documentation. (PGP only)
+#    Expands to the name of a file containing the signature part of a multipart/
+#    signed attachment when verifying it.
+#
+#%a
+#
+#    The value of $pgp_sign_as.
+#
+#%r
+#
+#    One or more key IDs.
+#
+#For examples on how to configure these formats for the various versions of PGP
+#which are floating around, see the pgp*.rc and gpg.rc files in the samples/
+#subdirectory which has been installed on your system alongside the
+#documentation. (PGP only)
 #
 #  pgp_getkeys_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is invoked whenever mutt will need public key
-#   information. %r is the only printf-like sequence used with this
-#   format. (PGP only)
+#This command is invoked whenever mutt will need public key information. %r is
+#the only printf-like sequence used with this format. (PGP only)
 #
 #  pgp_verify_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to verify PGP signatures. (PGP only)
+#This command is used to verify PGP signatures. (PGP only)
 #
 #  pgp_decrypt_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to decrypt a PGP encrypted message. (PGP only)
+#This command is used to decrypt a PGP encrypted message. (PGP only)
 #
 #  pgp_clearsign_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This format is used to create a old-style "clearsigned" PGP message.
-#   Note that the use of this format is strongly deprecated. (PGP only)
+#This format is used to create a old-style "clearsigned" PGP message. Note that
+#the use of this format is stronglydeprecated. (PGP only)
 #
 #  pgp_sign_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to create the detached PGP signature for a
-#   multipart/signed PGP/MIME body part. (PGP only)
+#This command is used to create the detached PGP signature for a multipart/
+#signed PGP/MIME body part. (PGP only)
 #
 #  pgp_encrypt_sign_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to both sign and encrypt a body part. (PGP only)
+#This command is used to both sign and encrypt a body part. (PGP only)
 #
 #  pgp_encrypt_only_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to encrypt a body part without signing it. (PGP
-#   only)
+#This command is used to encrypt a body part without signing it. (PGP only)
 #
 #  pgp_import_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to import a key from a message into the user's
-#   public key ring. (PGP only)
+#This command is used to import a key from a message into the user's public key
+#ring. (PGP only)
 #
 #  pgp_export_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to export a public key from the user's key ring.
-#   (PGP only)
+#This command is used to export a public key from the user's key ring. (PGP
+#only)
 #
 #  pgp_verify_key_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to verify key information from the key selection
-#   menu. (PGP only)
+#This command is used to verify key information from the key selection menu.
+#(PGP only)
 #
 #  pgp_list_secring_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to list the secret key ring's contents. The
-#   output format must be analogous to the one used by gpg --list-keys
-#   --with-colons.
+#This command is used to list the secret key ring's contents. The output format
+#must be analogous to the one used by gpg --list-keys --with-colons.
 #
-#   This format is also generated by the pgpring utility which comes with
-#   mutt. (PGP only)
+#This format is also generated by the pgpring utility which comes with mutt.
+#(PGP only)
 #
 #  pgp_list_pubring_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to list the public key ring's contents. The
-#   output format must be analogous to the one used by gpg --list-keys
-#   --with-colons.
+#This command is used to list the public key ring's contents. The output format
+#must be analogous to the one used by gpg --list-keys --with-colons.
 #
-#   This format is also generated by the pgpring utility which comes with
-#   mutt. (PGP only)
+#This format is also generated by the pgpring utility which comes with mutt.
+#(PGP only)
 #
 #  forward_decrypt
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls the handling of encrypted messages when forwarding a message.
-#   When set, the outer layer of encryption is stripped off. This variable
-#   is only used if ``$mime_forward'' is set and ``$mime_forward_decode''
-#   is unset. (PGP only)
+#Controls the handling of encrypted messages when forwarding a message. When
+#set, the outer layer of encryption is stripped off. This variable is only used
+#if ``$mime_forward'' is set and ``$mime_forward_decode'' is unset. (PGP only)
 #
 #  smime_timeout
 #
-#   Type: number
-#   Default: 300
+#Type: number
+#Default: 300
 #
-#   The number of seconds after which a cached passphrase will expire if
-#   not used. (S/MIME only)
+#The number of seconds after which a cached passphrase will expire if not used.
+#(S/MIME only)
 #
 #  smime_encrypt_with
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This sets the algorithm that should be used for encryption. Valid
-#   choices are "des", "des3", "rc2-40", "rc2-64", "rc2-128". If unset
-#   "3des" (TripleDES) is used. (S/MIME only)
+#This sets the algorithm that should be used for encryption. Valid choices are
+#"des", "des3", "rc2-40", "rc2-64", "rc2-128". If unset "3des" (TripleDES) is
+#used. (S/MIME only)
 #
 #  smime_keys
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   Since there is no pubring/secring as with PGP, mutt has to handle
-#   storage ad retrieval of keys/certs by itself. This is very basic right
-#   now, and stores keys and certificates in two different directories,
-#   both named as the hash-value retrieved from OpenSSL. There is an index
-#   file which contains mailbox-address keyid pair, and which can be
-#   manually edited. This one points to the location of the private keys.
-#   (S/MIME only)
+#Since there is no pubring/secring as with PGP, mutt has to handle storage ad
+#retrieval of keys/certs by itself. This is very basic right now, and stores
+#keys and certificates in two different directories, both named as the
+#hash-value retrieved from OpenSSL. There is an index file which contains
+#mailbox-address keyid pair, and which can be manually edited. This one points
+#to the location of the private keys. (S/MIME only)
 #
 #  smime_ca_location
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   This variable contains the name of either a directory, or a file which
-#   contains trusted certificates for use with OpenSSL. (S/MIME only)
+#This variable contains the name of either a directory, or a file which contains
+#trusted certificates for use with OpenSSL. (S/MIME only)
 #
 #  smime_certificates
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   Since there is no pubring/secring as with PGP, mutt has to handle
-#   storage and retrieval of keys by itself. This is very basic right now,
-#   and keys and certificates are stored in two different directories,
-#   both named as the hash-value retrieved from OpenSSL. There is an index
-#   file which contains mailbox-address keyid pairs, and which can be
-#   manually edited. This one points to the location of the certificates.
-#   (S/MIME only)
+#Since there is no pubring/secring as with PGP, mutt has to handle storage and
+#retrieval of keys by itself. This is very basic right now, and keys and
+#certificates are stored in two different directories, both named as the
+#hash-value retrieved from OpenSSL. There is an index file which contains
+#mailbox-address keyid pairs, and which can be manually edited. This one points
+#to the location of the certificates. (S/MIME only)
 #
 #  smime_decrypt_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This format string specifies a command which is used to decrypt
-#   application/x-pkcs7-mime attachments.
+#This format string specifies a command which is used to decrypt application/
+#x-pkcs7-mime attachments.
 #
-#   The OpenSSL command formats have their own set of printf-like
-#   sequences similar to PGP's:
+#The OpenSSL command formats have their own set of printf-like sequences similar
+#to PGP's:
 #
-#   %f
-#          Expands to the name of a file containing a message.
+#%f
 #
-#   %s
-#          Expands to the name of a file containing the signature part of
-#          a multipart/signed attachment when verifying it.
+#    Expands to the name of a file containing a message.
 #
-#   %k
-#          The key-pair specified with $smime_default_key
+#%s
 #
-#   %c
-#          One or more certificate IDs.
+#    Expands to the name of a file containing the signature part of a multipart/
+#    signed attachment when verifying it.
 #
-#   %a
-#          The algorithm used for encryption.
+#%k
 #
-#   %C
-#          CA location: Depending on whether $smime_ca_location points to
-#          a directory or file, this expands to "-CApath
-#          $smime_ca_location" or "-CAfile $smime_ca_location".
+#    The key-pair specified with $smime_default_key
 #
-#   For examples on how to configure these formats, see the smime.rc in
-#   the samples/ subdirectory which has been installed on your system
-#   alongside the documentation. (S/MIME only)
+#%c
+#
+#    One or more certificate IDs.
+#
+#%a
+#
+#    The algorithm used for encryption.
+#
+#%C
+#
+#    CA location: Depending on whether $smime_ca_location points to a directory
+#    or file, this expands to "-CApath $smime_ca_location" or "-CAfile
+#    $smime_ca_location".
+#
+#For examples on how to configure these formats, see the smime.rc in the samples
+#/ subdirectory which has been installed on your system alongside the
+#documentation. (S/MIME only)
 #
 #  smime_verify_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to verify S/MIME signatures of type
-#   multipart/signed. (S/MIME only)
+#This command is used to verify S/MIME signatures of type multipart/signed. (S/
+#MIME only)
 #
 #  smime_verify_opaque_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to verify S/MIME signatures of type
-#   application/x-pkcs7-mime. (S/MIME only)
+#This command is used to verify S/MIME signatures of type application/
+#x-pkcs7-mime. (S/MIME only)
 #
 #  smime_sign_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to created S/MIME signatures of type
-#   multipart/signed, which can be read by all mail clients. (S/MIME only)
+#This command is used to created S/MIME signatures of type multipart/signed,
+#which can be read by all mail clients. (S/MIME only)
 #
 #  smime_sign_opaque_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to created S/MIME signatures of type
-#   application/x-pkcs7-signature, which can only be handled by mail
-#   clients supporting the S/MIME extension. (S/MIME only)
+#This command is used to created S/MIME signatures of type application/
+#x-pkcs7-signature, which can only be handled by mail clients supporting the S/
+#MIME extension. (S/MIME only)
 #
 #  smime_encrypt_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to create encrypted S/MIME messages. (S/MIME
-#   only)
+#This command is used to create encrypted S/MIME messages. (S/MIME only)
 #
 #  smime_pk7out_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to extract PKCS7 structures of S/MIME signatures,
-#   in order to extract the public X509 certificate(s). (S/MIME only)
+#This command is used to extract PKCS7 structures of S/MIME signatures, in order
+#to extract the public X509 certificate(s). (S/MIME only)
 #
 #  smime_get_cert_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to extract X509 certificates from a PKCS7
-#   structure. (S/MIME only)
+#This command is used to extract X509 certificates from a PKCS7 structure. (S/
+#MIME only)
 #
 #  smime_get_signer_cert_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to extract only the signers X509 certificate from
-#   a S/MIME signature, so that the certificate's owner may get compared
-#   to the email's 'From'-field. (S/MIME only)
+#This command is used to extract only the signers X509 certificate from a S/MIME
+#signature, so that the certificate's owner may get compared to the email's
+#'From'-field. (S/MIME only)
 #
 #  smime_import_cert_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to import a certificate via smime_keys. (S/MIME
-#   only)
+#This command is used to import a certificate via smime_keys. (S/MIME only)
 #
 #  smime_get_cert_email_command
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This command is used to extract the mail address(es) used for storing
-#   X509 certificates, and for verification purposes (to check whether the
-#   certificate was issued for the sender's mailbox). (S/MIME only)
+#This command is used to extract the mail address(es) used for storing X509
+#certificates, and for verification purposes (to check whether the certificate
+#was issued for the sender's mailbox). (S/MIME only)
 #
 #  smime_default_key
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This is the default key-pair to use for signing. This must be set to
-#   the keyid (the hash-value that OpenSSL generates) to work properly
-#   (S/MIME only)
+#This is the default key-pair to use for signing. This must be set to the keyid
+#(the hash-value that OpenSSL generates) to work properly (S/MIME only)
 #
 #  ssl_client_cert
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   The file containing a client certificate and its associated private
-#   key.
+#The file containing a client certificate and its associated private key.
 #
 #  ssl_force_tls
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If this variable is set, Mutt will require that all connections to
-#   remote servers be encrypted. Furthermore it will attempt to negotiate
-#   TLS even if the server does not advertise the capability, since it
-#   would otherwise have to abort the connection anyway. This option
-#   supersedes ``$ssl_starttls''.
+#If this variable is set, Mutt will require that all connections to remote
+#servers be encrypted. Furthermore it will attempt to negotiate TLS even if the
+#server does not advertise the capability, since it would otherwise have to
+#abort the connection anyway. This option supersedes ``$ssl_starttls''.
 #
 #  ssl_starttls
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   If set (the default), mutt will attempt to use STARTTLS on servers
-#   advertising the capability. When unset, mutt will not attempt to use
-#   STARTTLS regardless of the server's capabilities.
+#If set (the default), mutt will attempt to use STARTTLS on servers advertising
+#the capability. When unset, mutt will not attempt to use STARTTLS regardless of
+#the server's capabilities.
 #
 #  certificate_file
 #
-#   Type: path
-#   Default: "~/.mutt_certificates"
+#Type: path
+#Default: "~/.mutt_certificates"
 #
-#   This variable specifies the file where the certificates you trust are
-#   saved. When an unknown certificate is encountered, you are asked if
-#   you accept it or not. If you accept it, the certificate can also be
-#   saved in this file and further connections are automatically accepted.
+#This variable specifies the file where the certificates you trust are saved.
+#When an unknown certificate is encountered, you are asked if you accept it or
+#not. If you accept it, the certificate can also be saved in this file and
+#further connections are automatically accepted.
 #
-#   You can also manually add CA certificates in this file. Any server
-#   certificate that is signed with one of these CA certificates are also
-#   automatically accepted.
+#You can also manually add CA certificates in this file. Any server certificate
+#that is signed with one of these CA certificates are also automatically
+#accepted.
 #
-#   Example: set certificate_file=~/.mutt/certificates
+#Example: set certificate_file=~/.mutt/certificates
 #
 #  ssl_usesystemcerts
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set to yes, mutt will use CA certificates in the system-wide
-#   certificate store when checking if server certificate is signed by a
-#   trusted CA.
+#If set to yes, mutt will use CA certificates in the system-wide certificate
+#store when checking if server certificate is signed by a trusted CA.
 #
 #  entropy_file
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   The file which includes random data that is used to initialize SSL
-#   library functions.
+#The file which includes random data that is used to initialize SSL library
+#functions.
 #
 #  ssl_use_sslv2
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variables specifies whether to attempt to use SSLv2 in the SSL
-#   authentication process.
+#This variables specifies whether to attempt to use SSLv2 in the SSL
+#authentication process.
 #
 #  ssl_use_sslv3
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variables specifies whether to attempt to use SSLv3 in the SSL
-#   authentication process.
+#This variables specifies whether to attempt to use SSLv3 in the SSL
+#authentication process.
 #
 #  ssl_use_tlsv1
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variables specifies whether to attempt to use TLSv1 in the SSL
-#   authentication process.
+#This variables specifies whether to attempt to use TLSv1 in the SSL
+#authentication process.
 #
 #  ssl_min_dh_prime_bits
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   This variable specifies the minimum acceptable prime size (in bits)
-#   for use in any Diffie-Hellman key exchange. A value of 0 will use the
-#   default from the GNUTLS library.
+#This variable specifies the minimum acceptable prime size (in bits) for use in
+#any Diffie-Hellman key exchange. A value of 0 will use the default from the
+#GNUTLS library.
 #
 #  ssl_ca_certificates_file
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   This variable specifies a file containing trusted CA certificates. Any
-#   server certificate that is signed with one of these CA certificates
-#   are also automatically accepted.
+#This variable specifies a file containing trusted CA certificates. Any server
+#certificate that is signed with one of these CA certificates are also
+#automatically accepted.
 #
-#   Example: set
-#   ssl_ca_certificates_file=/etc/ssl/certs/ca-certificates.crt
+#Example: set ssl_ca_certificates_file=/etc/ssl/certs/ca-certificates.crt
 #
 #  pipe_split
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Used in connection with the pipe-message command and the ``tag-
-#   prefix'' operator. If this variable is unset, when piping a list of
-#   tagged messages Mutt will concatenate the messages and will pipe them
-#   as a single folder. When set, Mutt will pipe the messages one by one.
-#   In both cases the messages are piped in the current sorted order, and
-#   the ``$pipe_sep'' separator is added after each message.
+#Used in connection with the pipe-message command and the ``tag- prefix''
+#operator. If this variable is unset, when piping a list of tagged messages Mutt
+#will concatenate the messages and will pipe them as a single folder. When set,
+#Mutt will pipe the messages one by one. In both cases the messages are piped in
+#the current sorted order, and the ``$pipe_sep'' separator is added after each
+#message.
 #
 #  pipe_decode
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Used in connection with the pipe-message command. When unset, Mutt
-#   will pipe the messages without any preprocessing. When set, Mutt will
-#   weed headers and will attempt to PGP/MIME decode the messages first.
+#Used in connection with the pipe-message command. When unset, Mutt will pipe
+#the messages without any preprocessing. When set, Mutt will weed headers and
+#will attempt to PGP/MIME decode the messages first.
 #
 #  pipe_sep
 #
-#   Type: string
-#   Default: "\n"
+#Type: string
+#Default: "\n"
 #
-#   The separator to add between messages when piping a list of tagged
-#   messages to an external Unix command.
+#The separator to add between messages when piping a list of tagged messages to
+#an external Unix command.
 #
 #  pop_authenticators
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This is a colon-delimited list of authentication methods mutt may
-#   attempt to use to log in to an POP server, in the order mutt should
-#   try them. Authentication methods are either 'user', 'apop' or any SASL
-#   mechanism, eg 'digest-md5', 'gssapi' or 'cram-md5'. This parameter is
-#   case-insensitive. If this parameter is unset (the default) mutt will
-#   try all available methods, in order from most-secure to least-secure.
+#This is a colon-delimited list of authentication methods mutt may attempt to
+#use to log in to an POP server, in the order mutt should try them.
+#Authentication methods are either 'user', 'apop' or any SASL mechanism, eg
+#'digest-md5', 'gssapi' or 'cram-md5'. This parameter is case-insensitive. If
+#this parameter is unset (the default) mutt will try all available methods, in
+#order from most-secure to least-secure.
 #
-#   Example: set pop_authenticators="digest-md5:apop:user"
+#Example: set pop_authenticators="digest-md5:apop:user"
 #
 #  pop_auth_try_all
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, Mutt will try all available methods. When unset, Mutt will
-#   only fall back to other authentication methods if the previous methods
-#   are unavailable. If a method is available but authentication fails,
-#   Mutt will not connect to the POP server.
+#If set, Mutt will try all available methods. When unset, Mutt will only fall
+#back to other authentication methods if the previous methods are unavailable.
+#If a method is available but authentication fails, Mutt will not connect to the
+#POP server.
 #
 #  pop_checkinterval
 #
-#   Type: number
-#   Default: 60
+#Type: number
+#Default: 60
 #
-#   This variable configures how often (in seconds) mutt should look for
-#   new mail in the currently selected mailbox if it is a POP mailbox.
+#This variable configures how often (in seconds) mutt should look for new mail
+#in the currently selected mailbox if it is a POP mailbox.
 #
 #  pop_delete
 #
-#   Type: quadoption
-#   Default: ask-no
+#Type: quadoption
+#Default: ask-no
 #
-#   If set, Mutt will delete successfully downloaded messages from the POP
-#   server when using the fetch-mail function. When unset, Mutt will
-#   download messages but also leave them on the POP server.
+#If set, Mutt will delete successfully downloaded messages from the POP server
+#when using the fetch-mail function. When unset, Mutt will download messages but
+#also leave them on the POP server.
 #
 #  pop_host
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   The name of your POP server for the fetch-mail function. You can also
-#   specify an alternative port, username and password, ie:
+#The name of your POP server for the fetch-mail function. You can also specify
+#an alternative port, username and password, ie:
 #
-#   [pop[s]://][username[:password]@]popserver[:port]
+#[pop[s]://][username[:password]@]popserver[:port]
 #
 #  pop_last
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If this variable is set, mutt will try to use the "LAST" POP command
-#   for retrieving only unread messages from the POP server when using the
-#   fetch-mail function.
+#If this variable is set, mutt will try to use the "LAST" POP command for
+#retrieving only unread messages from the POP server when using the fetch-mail
+#function.
 #
 #  pop_reconnect
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether or not Mutt will try to reconnect to POP server if
-#   the connection is lost.
+#Controls whether or not Mutt will try to reconnect to POP server if the
+#connection is lost.
 #
 #  pop_user
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Your login name on the POP server.
+#Your login name on the POP server.
 #
-#   This variable defaults to your user name on the local machine.
+#This variable defaults to your user name on the local machine.
 #
 #  pop_pass
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Specifies the password for your POP account. If unset, Mutt will
-#   prompt you for your password when you open POP mailbox. Warning: you
-#   should only use this option when you are on a fairly secure machine,
-#   because the superuser can read your muttrc even if you are the only
-#   one who can read the file.
+#Specifies the password for your POP account. If unset, Mutt will prompt you for
+#your password when you open POP mailbox. Warning: you should only use this
+#option when you are on a fairly secure machine, because the superuser can read
+#your muttrc even if you are the only one who can read the file.
 #
 #  post_indent_string
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Similar to the ``$attribution'' variable, Mutt will append this string
-#   after the inclusion of a message which is being replied to.
+#Similar to the ``$attribution'' variable, Mutt will append this string after
+#the inclusion of a message which is being replied to.
 #
 #  postpone
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether or not messages are saved in the ``$postponed''
-#   mailbox when you elect not to send immediately.
+#Controls whether or not messages are saved in the ``$postponed'' mailbox when
+#you elect not to send immediately. Also see the ``$recall'' variable.
 #
 #  postponed
 #
-#   Type: path
-#   Default: "~/postponed"
+#Type: path
+#Default: "~/postponed"
 #
-#   Mutt allows you to indefinitely ``postpone sending a message'' which
-#   you are editing. When you choose to postpone a message, Mutt saves it
-#   in the mailbox specified by this variable. Also see the ``$postpone''
-#   variable.
+#Mutt allows you to indefinitely ``postpone sending a message'' which you are
+#editing. When you choose to postpone a message, Mutt saves it in the mailbox
+#specified by this variable. Also see the ``$postpone'' variable.
 #
 #  preconnect
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   If set, a shell command to be executed if mutt fails to establish a
-#   connection to the server. This is useful for setting up secure
-#   connections, e.g. with ssh(1). If the command returns a nonzero
-#   status, mutt gives up opening the server. Example:
+#If set, a shell command to be executed if mutt fails to establish a connection
+#to the server. This is useful for setting up secure connections, e.g. with ssh
+#(1). If the command returns a nonzero status, mutt gives up opening the server.
+#Example:
 #
-#   preconnect="ssh -f -q -L 1234:mailhost.net:143 mailhost.net sleep 20 <
-#   /dev/null > /dev/null"
+#preconnect="ssh -f -q -L 1234:mailhost.net:143 mailhost.net sleep 20 < /dev/
+#null > /dev/null"
 #
-#   Mailbox 'foo' on mailhost.net can now be reached as
-#   '{localhost:1234}foo'.
+#Mailbox 'foo' on mailhost.net can now be reached as '{localhost:1234}foo'.
 #
-#   NOTE: For this example to work, you must be able to log in to the
-#   remote machine without having to enter a password.
+#NOTE: For this example to work, you must be able to log in to the remote
+#machine without having to enter a password.
 #
 #  print
 #
-#   Type: quadoption
-#   Default: ask-no
+#Type: quadoption
+#Default: ask-no
 #
-#   Controls whether or not Mutt really prints messages. This is set to
-#   ask-no by default, because some people accidentally hit ``p'' often
-#   (like me).
+#Controls whether or not Mutt really prints messages. This is set to ask-no by
+#default, because some people accidentally hit ``p'' often (like me).
 #
 #  print_command
 #
-#   Type: path
-#   Default: "lpr"
+#Type: path
+#Default: "lpr"
 #
-#   This specifies the command pipe that should be used to print messages.
+#This specifies the command pipe that should be used to print messages.
 #
 #  print_decode
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Used in connection with the print-message command. If this option is
-#   set, the message is decoded before it is passed to the external
-#   command specified by $print_command. If this option is unset, no
-#   processing will be applied to the message when printing it. The latter
-#   setting may be useful if you are using some advanced printer filter
-#   which is able to properly format e-mail messages for printing.
+#Used in connection with the print-message command. If this option is set, the
+#message is decoded before it is passed to the external command specified by
+#$print_command. If this option is unset, no processing will be applied to the
+#message when printing it. The latter setting may be useful if you are using
+#some advanced printer filter which is able to properly format e-mail messages
+#for printing.
 #
 #  print_split
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Used in connection with the print-message command. If this option is
-#   set, the command specified by $print_command is executed once for each
-#   message which is to be printed. If this option is unset, the command
-#   specified by $print_command is executed only once, and all the
-#   messages are concatenated, with a form feed as the message separator.
+#Used in connection with the print-message command. If this option is set, the
+#command specified by $print_command is executed once for each message which is
+#to be printed. If this option is unset, the command specified by $print_command
+#is executed only once, and all the messages are concatenated, with a form feed
+#as the message separator.
 #
-#   Those who use the enscript(1) program's mail-printing mode will most
-#   likely want to set this option.
+#Those who use the enscript(1) program's mail-printing mode will most likely
+#want to set this option.
 #
 #  prompt_after
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If you use an external ``$pager'', setting this variable will cause
-#   Mutt to prompt you for a command when the pager exits rather than
-#   returning to the index menu. If unset, Mutt will return to the index
-#   menu when the external pager exits.
+#If you use an external ``$pager'', setting this variable will cause Mutt to
+#prompt you for a command when the pager exits rather than returning to the
+#index menu. If unset, Mutt will return to the index menu when the external
+#pager exits.
 #
 #  query_command
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   This specifies the command that mutt will use to make external address
-#   queries. The string should contain a %s, which will be substituted
-#   with the query string the user types. See ``query'' for more
-#   information.
+#This specifies the command that mutt will use to make external address queries.
+#The string should contain a %s, which will be substituted with the query string
+#the user types. See ``query'' for more information.
+#
+#  query_format
+#
+#Type: string
+#Default: "%4c %t %-25.25a %-25.25n %?e?(%e)?"
+#
+#This variable describes the format of the `query' menu. The following
+#printf-style sequences are understood:
+#
+#%a
+#
+#    destination address
+#
+#%c
+#
+#    current entry number
+#
+#%e
+#
+#    extra information *
+#
+#%n
+#
+#    destination name
+#
+#%t
+#
+#    ``*'' if current entry is tagged, a space otherwise
+#
+#%>X
+#
+#    right justify the rest of the string and pad with "X"
+#
+#%|X
+#
+#    pad to the end of the line with "X"
+#
+#%*X
+#
+#    soft-fill with character "X" as pad
+#
+#For an explanation of `soft-fill', see the ``$index_format'' documentation.
+#
+#* = can be optionally printed if nonzero, see the ``$status_format''
+#documentation.
 #
 #  quit
 #
-#   Type: quadoption
-#   Default: yes
+#Type: quadoption
+#Default: yes
 #
-#   This variable controls whether ``quit'' and ``exit'' actually quit
-#   from mutt. If it set to yes, they do quit, if it is set to no, they
-#   have no effect, and if it is set to ask-yes or ask-no, you are
-#   prompted for confirmation when you try to quit.
+#This variable controls whether ``quit'' and ``exit'' actually quit from mutt.
+#If it set to yes, they do quit, if it is set to no, they have no effect, and if
+#it is set to ask-yes or ask-no, you are prompted for confirmation when you try
+#to quit.
 #
 #  quote_regexp
 #
-#   Type: regular expression
-#   Default: "^([ \t]*[|>:}#])+"
+#Type: regular expression
+#Default: "^([ \t]*[|>:}#])+"
 #
-#   A regular expression used in the internal-pager to determine quoted
-#   sections of text in the body of a message.
+#A regular expression used in the internal-pager to determine quoted sections of
+#text in the body of a message.
 #
-#   Note: In order to use the quotedx patterns in the internal pager, you
-#   need to set this to a regular expression that matches exactly the
-#   quote characters at the beginning of quoted lines.
+#Note: In order to use the quotedx patterns in the internal pager, you need to
+#set this to a regular expression that matches exactly the quote characters at
+#the beginning of quoted lines.
 #
 #  read_inc
 #
-#   Type: number
-#   Default: 10
+#Type: number
+#Default: 10
 #
-#   If set to a value greater than 0, Mutt will display which message it
-#   is currently on when reading a mailbox or when performing search
-#   actions such as search and limit. The message is printed after
-#   read_inc messages have been read or searched (e.g., if set to 25, Mutt
-#   will print a message when it is at message 25, and then again when it
-#   gets to message 50). This variable is meant to indicate progress when
-#   reading or searching large mailboxes which may take some time. When
-#   set to 0, only a single message will appear before the reading the
-#   mailbox.
+#If set to a value greater than 0, Mutt will display which message it is
+#currently on when reading a mailbox or when performing search actions such as
+#search and limit. The message is printed after read_inc messages have been read
+#or searched (e.g., if set to 25, Mutt will print a message when it is at
+#message 25, and then again when it gets to message 50). This variable is meant
+#to indicate progress when reading or searching large mailboxes which may take
+#some time. When set to 0, only a single message will appear before the reading
+#the mailbox.
 #
-#   Also see the ``$write_inc'' variable and the ``Tuning'' section of the
-#   manual for performance considerations.
+#Also see the ``$write_inc'' variable and the ``Tuning'' section of the manual
+#for performance considerations.
 #
 #  read_only
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, all folders are opened in read-only mode.
+#If set, all folders are opened in read-only mode.
 #
 #  realname
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This variable specifies what "real" or "personal" name should be used
-#   when sending messages.
+#This variable specifies what "real" or "personal" name should be used when
+#sending messages.
 #
-#   By default, this is the GECOS field from /etc/passwd. Note that this
-#   variable will not be used when the user has set a real name in the
-#   $from variable.
+#By default, this is the GECOS field from /etc/passwd. Note that this variable
+#will not be used when the user has set a real name in the $from variable.
 #
 #  recall
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   Controls whether or not Mutt recalls postponed messages when composing
-#   a new message. Also see ``$postponed''.
+#Controls whether or not Mutt recalls postponed messages when composing a new
+#message. Also see ``$postponed''.
 #
-#   Setting this variable to ``yes'' is not generally useful, and thus not
-#   recommended.
+#Setting this variable to ``yes'' is not generally useful, and thus not
+#recommended.
 #
 #  record
 #
-#   Type: path
-#   Default: "~/sent"
+#Type: path
+#Default: "~/sent"
 #
-#   This specifies the file into which your outgoing messages should be
-#   appended. (This is meant as the primary method for saving a copy of
-#   your messages, but another way to do this is using the ``my_hdr''
-#   command to create a Bcc: field with your email address in it.)
+#This specifies the file into which your outgoing messages should be appended.
+#(This is meant as the primary method for saving a copy of your messages, but
+#another way to do this is using the ``my_hdr'' command to create a Bcc: field
+#with your email address in it.)
 #
-#   The value of $record is overridden by the ``$force_name'' and
-#   ``$save_name'' variables, and the ``fcc-hook'' command.
+#The value of $record is overridden by the ``$force_name'' and ``$save_name''
+#variables, and the ``fcc-hook'' command.
 #
 #  reply_regexp
 #
-#   Type: regular expression
-#   Default: "^(re([\[0-9\]+])*|aw):[ \t]*"
+#Type: regular expression
+#Default: "^(re([\[0-9\]+])*|aw):[ \t]*"
 #
-#   A regular expression used to recognize reply messages when threading
-#   and replying. The default value corresponds to the English "Re:" and
-#   the German "Aw:".
+#A regular expression used to recognize reply messages when threading and
+#replying. The default value corresponds to the English "Re:" and the German
+#"Aw:".
 #
 #  reply_self
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If unset and you are replying to a message sent by you, Mutt will
-#   assume that you want to reply to the recipients of that message rather
-#   than to yourself.
+#If unset and you are replying to a message sent by you, Mutt will assume that
+#you want to reply to the recipients of that message rather than to yourself.
 #
 #  reply_to
 #
-#   Type: quadoption
-#   Default: ask-yes
+#Type: quadoption
+#Default: ask-yes
 #
-#   If set, when replying to a message, Mutt will use the address listed
-#   in the Reply-to: header as the recipient of the reply. If unset, it
-#   will use the address in the From: header field instead. This option is
-#   useful for reading a mailing list that sets the Reply-To: header field
-#   to the list address and you want to send a private message to the
-#   author of a message.
+#If set, when replying to a message, Mutt will use the address listed in the
+#Reply-to: header as the recipient of the reply. If unset, it will use the
+#address in the From: header field instead. This option is useful for reading a
+#mailing list that sets the Reply-To: header field to the list address and you
+#want to send a private message to the author of a message.
 #
 #  resolve
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, the cursor will be automatically advanced to the next
-#   (possibly undeleted) message whenever a command that modifies the
-#   current message is executed.
+#When set, the cursor will be automatically advanced to the next (possibly
+#undeleted) message whenever a command that modifies the current message is
+#executed.
 #
 #  reverse_alias
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable controls whether or not Mutt will display the "personal"
-#   name from your aliases in the index menu if it finds an alias that
-#   matches the message's sender. For example, if you have the following
-#   alias:
+#This variable controls whether or not Mutt will display the "personal" name
+#from your aliases in the index menu if it finds an alias that matches the
+#message's sender. For example, if you have the following alias:
 #
 #alias juser abd30425@somewhere.net (Joe User)
 #
-#   and then you receive mail which contains the following header:
+#
+#and then you receive mail which contains the following header:
 #
 #From: abd30425@somewhere.net
 #
-#   It would be displayed in the index menu as ``Joe User'' instead of
-#   ``abd30425@somewhere.net.'' This is useful when the person's e-mail
-#   address is not human friendly (like CompuServe addresses).
+#
+#It would be displayed in the index menu as ``Joe User'' instead of
+#``abd30425@somewhere.net.'' This is useful when the person's e-mail address is
+#not human friendly (like CompuServe addresses).
 #
 #  reverse_name
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   It may sometimes arrive that you receive mail to a certain machine,
-#   move the messages to another machine, and reply to some the messages
-#   from there. If this variable is set, the default From: line of the
-#   reply messages is built using the address where you received the
-#   messages you are replying to if that address matches your alternates.
-#   If the variable is unset, or the address that would be used doesn't
-#   match your alternates, the From: line will use your address on the
-#   current machine.
+#It may sometimes arrive that you receive mail to a certain machine, move the
+#messages to another machine, and reply to some the messages from there. If this
+#variable is set, the default From: line of the reply messages is built using
+#the address where you received the messages you are replying to if that address
+#matches your alternates. If the variable is unset, or the address that would be
+#used doesn't match your alternates, the From: line will use your address on the
+#current machine.
 #
 #  reverse_realname
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable fine-tunes the behaviour of the reverse_name feature.
-#   When it is set, mutt will use the address from incoming messages
-#   as-is, possibly including eventual real names. When it is unset, mutt
-#   will override any such real names with the setting of the realname
-#   variable.
+#This variable fine-tunes the behaviour of the reverse_name feature. When it is
+#set, mutt will use the address from incoming messages as-is, possibly including
+#eventual real names. When it is unset, mutt will override any such real names
+#with the setting of the realname variable.
 #
 #  rfc2047_parameters
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When this variable is set, Mutt will decode RFC-2047-encoded MIME
-#   parameters. You want to set this variable when mutt suggests you to
-#   save attachments to files named like this:
-#   =?iso-8859-1?Q?file=5F=E4=5F991116=2Ezip?=
+#When this variable is set, Mutt will decode RFC-2047-encoded MIME parameters.
+#You want to set this variable when mutt suggests you to save attachments to
+#files named like this: =?iso-8859-1?Q?file=5F=E4=5F991116=2Ezip?=
 #
-#   When this variable is set interactively, the change doesn't have the
-#   desired effect before you have changed folders.
+#When this variable is set interactively, the change doesn't have the desired
+#effect before you have changed folders.
 #
-#   Note that this use of RFC 2047's encoding is explicitly, prohibited by
-#   the standard, but nevertheless encountered in the wild. Also note that
-#   setting this parameter will not have the effect that mutt generates
-#   this kind of encoding. Instead, mutt will unconditionally use the
-#   encoding specified in RFC 2231.
+#Note that this use of RFC 2047's encoding is explicitly, prohibited by the
+#standard, but nevertheless encountered in the wild. Also note that setting this
+#parameter will not have the effect that mutt generates this kind of encoding.
+#Instead, mutt will unconditionally use the encoding specified in RFC 2231.
 #
 #  save_address
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, mutt will take the sender's full address when choosing a
-#   default folder for saving a mail. If ``$save_name'' or ``$force_name''
-#   is set too, the selection of the fcc folder will be changed as well.
+#If set, mutt will take the sender's full address when choosing a default folder
+#for saving a mail. If ``$save_name'' or ``$force_name'' is set too, the
+#selection of the fcc folder will be changed as well.
 #
 #  save_empty
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When unset, mailboxes which contain no saved messages will be removed
-#   when closed (the exception is ``$spoolfile'' which is never removed).
-#   If set, mailboxes are never removed.
+#When unset, mailboxes which contain no saved messages will be removed when
+#closed (the exception is ``$spoolfile'' which is never removed). If set,
+#mailboxes are never removed.
 #
-#   Note: This only applies to mbox and MMDF folders, Mutt does not delete
-#   MH and Maildir directories.
+#Note: This only applies to mbox and MMDF folders, Mutt does not delete MH and
+#Maildir directories.
 #
 #  save_history
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   This variable controls the size of the history saved in the
-#   ``$history_file'' file.
+#This variable controls the size of the history saved in the ``$history_file''
+#file.
 #
 #  save_name
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   This variable controls how copies of outgoing messages are saved. When
-#   set, a check is made to see if a mailbox specified by the recipient
-#   address exists (this is done by searching for a mailbox in the
-#   ``$folder'' directory with the username part of the recipient
-#   address). If the mailbox exists, the outgoing message will be saved to
-#   that mailbox, otherwise the message is saved to the ``$record''
-#   mailbox.
+#This variable controls how copies of outgoing messages are saved. When set, a
+#check is made to see if a mailbox specified by the recipient address exists
+#(this is done by searching for a mailbox in the ``$folder'' directory with the
+#username part of the recipient address). If the mailbox exists, the outgoing
+#message will be saved to that mailbox, otherwise the message is saved to the ``
+#$record'' mailbox.
 #
-#   Also see the ``$force_name'' variable.
+#Also see the ``$force_name'' variable.
 #
 #  score
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When this variable is unset, scoring is turned off. This can be useful
-#   to selectively disable scoring for certain folders when the
-#   ``$score_threshold_delete'' variable and friends are used.
+#When this variable is unset, scoring is turned off. This can be useful to
+#selectively disable scoring for certain folders when the ``
+#$score_threshold_delete'' variable and friends are used.
 #
 #  score_threshold_delete
 #
-#   Type: number
-#   Default: -1
+#Type: number
+#Default: -1
 #
-#   Messages which have been assigned a score equal to or lower than the
-#   value of this variable are automatically marked for deletion by mutt.
-#   Since mutt scores are always greater than or equal to zero, the
-#   default setting of this variable will never mark a message for
-#   deletion.
+#Messages which have been assigned a score equal to or lower than the value of
+#this variable are automatically marked for deletion by mutt. Since mutt scores
+#are always greater than or equal to zero, the default setting of this variable
+#will never mark a message for deletion.
 #
 #  score_threshold_flag
 #
-#   Type: number
-#   Default: 9999
+#Type: number
+#Default: 9999
 #
-#   Messages which have been assigned a score greater than or equal to
-#   this variable's value are automatically marked "flagged".
+#Messages which have been assigned a score greater than or equal to this
+#variable's value are automatically marked "flagged".
 #
 #  score_threshold_read
 #
-#   Type: number
-#   Default: -1
+#Type: number
+#Default: -1
 #
-#   Messages which have been assigned a score equal to or lower than the
-#   value of this variable are automatically marked as read by mutt. Since
-#   mutt scores are always greater than or equal to zero, the default
-#   setting of this variable will never mark a message read.
+#Messages which have been assigned a score equal to or lower than the value of
+#this variable are automatically marked as read by mutt. Since mutt scores are
+#always greater than or equal to zero, the default setting of this variable will
+#never mark a message read.
 #
 #  send_charset
 #
-#   Type: string
-#   Default: "us-ascii:iso-8859-1:utf-8"
+#Type: string
+#Default: "us-ascii:iso-8859-1:utf-8"
 #
-#   A list of character sets for outgoing messages. Mutt will use the
-#   first character set into which the text can be converted exactly. If
-#   your ``$charset'' is not iso-8859-1 and recipients may not understand
-#   UTF-8, it is advisable to include in the list an appropriate widely
-#   used standard character set (such as iso-8859-2, koi8-r or
-#   iso-2022-jp) either instead of or after "iso-8859-1".
+#A colon-delimited list of character sets for outgoing messages. Mutt will use
+#the first character set into which the text can be converted exactly. If your
+#``$charset'' is not iso-8859-1 and recipients may not understand UTF-8, it is
+#advisable to include in the list an appropriate widely used standard character
+#set (such as iso-8859-2, koi8-r or iso-2022-jp) either instead of or after
+#"iso-8859-1".
+#
+#In case the text cannot be converted into one of these exactly, mutt uses ``
+#$charset'' as a fallback.
 #
 #  sendmail
 #
-#   Type: path
-#   Default: "/usr/sbin/sendmail -oem -oi"
+#Type: path
+#Default: "/usr/sbin/sendmail -oem -oi"
 #
-#   Specifies the program and arguments used to deliver mail sent by Mutt.
-#   Mutt expects that the specified program interprets additional
-#   arguments as recipient addresses.
+#Specifies the program and arguments used to deliver mail sent by Mutt. Mutt
+#expects that the specified program interprets additional arguments as recipient
+#addresses.
 #
 #  sendmail_wait
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   Specifies the number of seconds to wait for the ``$sendmail'' process
-#   to finish before giving up and putting delivery in the background.
+#Specifies the number of seconds to wait for the ``$sendmail'' process to finish
+#before giving up and putting delivery in the background.
 #
-#   Mutt interprets the value of this variable as follows:
+#Mutt interprets the value of this variable as follows:
 #
-#   >0
-#          number of seconds to wait for sendmail to finish before
-#          continuing
+#>0
 #
-#   0
-#          wait forever for sendmail to finish
+#    number of seconds to wait for sendmail to finish before continuing
 #
-#   <0
-#          always put sendmail in the background without waiting
+#0
 #
-#   Note that if you specify a value other than 0, the output of the child
-#   process will be put in a temporary file. If there is some error, you
-#   will be informed as to where to find the output.
+#    wait forever for sendmail to finish
+#
+#<0
+#
+#    always put sendmail in the background without waiting
+#
+#Note that if you specify a value other than 0, the output of the child process
+#will be put in a temporary file. If there is some error, you will be informed
+#as to where to find the output.
 #
 #  shell
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   Command to use when spawning a subshell. By default, the user's login
-#   shell from /etc/passwd is used.
+#Command to use when spawning a subshell. By default, the user's login shell
+#from /etc/passwd is used.
 #
 #  sig_dashes
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   If set, a line containing ``-- '' will be inserted before your
-#   ``$signature''. It is strongly recommended that you not unset this
-#   variable unless your ``signature'' contains just your name. The reason
-#   for this is because many software packages use ``-- \n'' to detect
-#   your signature. For example, Mutt has the ability to highlight the
-#   signature in a different color in the builtin pager.
+#If set, a line containing ``-- '' will be inserted before your ``$signature''.
+#It is strongly recommended that you not unset this variable unless your
+#``signature'' contains just your name. The reason for this is because many
+#software packages use ``-- \n'' to detect your signature. For example, Mutt has
+#the ability to highlight the signature in a different color in the builtin
+#pager.
 #
 #  sig_on_top
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, the signature will be included before any quoted or forwarded
-#   text. It is strongly recommended that you do not set this variable
-#   unless you really know what you are doing, and are prepared to take
-#   some heat from netiquette guardians.
+#If set, the signature will be included before any quoted or forwarded text. It
+#is strongly recommended that you do not set this variable unless you really
+#know what you are doing, and are prepared to take some heat from netiquette
+#guardians.
 #
 #  signature
 #
-#   Type: path
-#   Default: "~/.signature"
+#Type: path
+#Default: "~/.signature"
 #
-#   Specifies the filename of your signature, which is appended to all
-#   outgoing messages. If the filename ends with a pipe (``|''), it is
-#   assumed that filename is a shell command and input should be read from
-#   its stdout.
+#Specifies the filename of your signature, which is appended to all outgoing
+#messages. If the filename ends with a pipe (``|''), it is assumed that filename
+#is a shell command and input should be read from its stdout.
 #
 #  simple_search
 #
-#   Type: string
-#   Default: "~f %s | ~s %s"
+#Type: string
+#Default: "~f %s | ~s %s"
 #
-#   Specifies how Mutt should expand a simple search into a real search
-#   pattern. A simple search is one that does not contain any of the ~
-#   operators. See ``patterns'' for more information on search patterns.
+#Specifies how Mutt should expand a simple search into a real search pattern. A
+#simple search is one that does not contain any of the ~ operators. See ``
+#patterns'' for more information on search patterns.
 #
-#   For example, if you simply type joe at a search or limit prompt, Mutt
-#   will automatically expand it to the value specified by this variable.
-#   For the default value it would be:
+#For example, if you simply type joe at a search or limit prompt, Mutt will
+#automatically expand it to the value specified by this variable. For the
+#default value it would be:
 #
-#   ~f joe | ~s joe
+#~f joe | ~s joe
 #
 #  smart_wrap
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls the display of lines longer than the screen width in the
-#   internal pager. If set, long lines are wrapped at a word boundary. If
-#   unset, lines are simply wrapped at the screen edge. Also see the
-#   ``$markers'' variable.
+#Controls the display of lines longer than the screen width in the internal
+#pager. If set, long lines are wrapped at a word boundary. If unset, lines are
+#simply wrapped at the screen edge. Also see the ``$markers'' variable.
 #
 #  smileys
 #
-#   Type: regular expression
-#   Default: "(>From )|(:[-^]?[][)(><}{|/DP])"
+#Type: regular expression
+#Default: "(>From )|(:[-^]?[][)(><}{|/DP])"
 #
-#   The pager uses this variable to catch some common false positives of
-#   ``$quote_regexp'', most notably smileys in the beginning of a line
+#The pager uses this variable to catch some common false positives of ``
+#$quote_regexp'', most notably smileys in the beginning of a line
 #
 #  sleep_time
 #
-#   Type: number
-#   Default: 1
+#Type: number
+#Default: 1
 #
-#   Specifies time, in seconds, to pause while displaying certain
-#   informational messages, while moving from folder to folder and after
-#   expunging messages from the current folder. The default is to pause
-#   one second, so a value of zero for this option suppresses the pause.
-#
-#  smtp_url
-#
-#   Type: string
-#   Default: ""
-#
-#   Defines the SMTP ``smart'' host where sent messages should relayed for
-#   delivery. This should take the form of an SMTP URL, eg:
-#
-#   smtp[s]://[user[:pass]@]host[:port]/
-#
-#   Setting this variable overrides the value of the ``$sendmail''
-#   variable.
+#Specifies time, in seconds, to pause while displaying certain informational
+#messages, while moving from folder to folder and after expunging messages from
+#the current folder. The default is to pause one second, so a value of zero for
+#this option suppresses the pause.
 #
 #  smtp_authenticators
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   This is a colon-delimited list of authentication methods mutt may
-#   attempt to use to log in to an SMTP server, in the order mutt should
-#   try them. Authentication methods are any SASL mechanism, eg
-#   ``digest-md5'', ``gssapi'' or ``cram-md5''. This parameter is
-#   case-insensitive. If this parameter is unset (the default) mutt will
-#   try all available methods, in order from most-secure to least-secure.
+#This is a colon-delimited list of authentication methods mutt may attempt to
+#use to log in to an SMTP server, in the order mutt should try them.
+#Authentication methods are any SASL mechanism, eg ``digest-md5'', ``gssapi'' or
+#``cram-md5''. This parameter is case-insensitive. If this parameter is unset
+#(the default) mutt will try all available methods, in order from most-secure to
+#least-secure.
 #
-#   Example: set smtp_authenticators="digest-md5:cram-md5"
+#Example: set smtp_authenticators="digest-md5:cram-md5"
+#
+#  smtp_pass
+#
+#Type: string
+#Default: ""
+#
+#Specifies the password for your SMTP account. If unset, Mutt will prompt you
+#for your password when you first send mail via SMTP. See ``smtp_url'' to
+#configure mutt to send mail via SMTP. Warning: you should only use this option
+#when you are on a fairly secure machine, because the superuser can read your
+#muttrc even if you are the only one who can read the file.
+#
+#  smtp_url
+#
+#Type: string
+#Default: ""
+#
+#Defines the SMTP ``smart'' host where sent messages should relayed for
+#delivery. This should take the form of an SMTP URL, eg:
+#
+#smtp[s]://[user[:pass]@]host[:port]/
+#
+#Setting this variable overrides the value of the ``$sendmail'' variable.
 #
 #  sort
 #
-#   Type: sort order
-#   Default: date
+#Type: sort order
+#Default: date
 #
-#   Specifies how to sort messages in the index menu. Valid values are:
+#Specifies how to sort messages in the index menu. Valid values are:
 #
 #   date or date-sent
 #   date-received
@@ -8719,481 +8955,520 @@ __DATA__
 #   threads
 #   to
 #
-#   You may optionally use the reverse- prefix to specify reverse sorting
-#   order (example: set sort=reverse-date-sent).
+#
+#You may optionally use the reverse- prefix to specify reverse sorting order
+#(example: set sort=reverse-date-sent).
 #
 #  sort_alias
 #
-#   Type: sort order
-#   Default: alias
+#Type: sort order
+#Default: alias
 #
-#   Specifies how the entries in the `alias' menu are sorted. The
-#   following are legal values:
+#Specifies how the entries in the `alias' menu are sorted. The following are
+#legal values:
 #
 #   address (sort alphabetically by email address)
 #   alias (sort alphabetically by alias name)
 #   unsorted (leave in order specified in .muttrc)
 #
+#
 #  sort_aux
 #
-#   Type: sort order
-#   Default: date
+#Type: sort order
+#Default: date
 #
-#   When sorting by threads, this variable controls how threads are sorted
-#   in relation to other threads, and how the branches of the thread trees
-#   are sorted. This can be set to any value that ``$sort'' can, except
-#   threads (in that case, mutt will just use date-sent). You can also
-#   specify the last- prefix in addition to the reverse- prefix, but last-
-#   must come after reverse-. The last- prefix causes messages to be
-#   sorted against its siblings by which has the last descendant, using
-#   the rest of sort_aux as an ordering. For instance, set sort_aux=last-
-#   date-received would mean that if a new message is received in a
-#   thread, that thread becomes the last one displayed (or the first, if
-#   you have set sort=reverse-threads.) Note: For reversed ``$sort'' order
-#   $sort_aux is reversed again (which is not the right thing to do, but
-#   kept to not break any existing configuration setting).
+#When sorting by threads, this variable controls how threads are sorted in
+#relation to other threads, and how the branches of the thread trees are sorted.
+#This can be set to any value that ``$sort'' can, except threads (in that case,
+#mutt will just use date-sent). You can also specify the last- prefix in
+#addition to the reverse- prefix, but last- must come after reverse-. The last-
+#prefix causes messages to be sorted against its siblings by which has the last
+#descendant, using the rest of sort_aux as an ordering. For instance, set
+#sort_aux=last- date-received would mean that if a new message is received in a
+#thread, that thread becomes the last one displayed (or the first, if you have
+#set sort=reverse-threads.) Note: For reversed ``$sort'' order $sort_aux is
+#reversed again (which is not the right thing to do, but kept to not break any
+#existing configuration setting).
 #
 #  sort_browser
 #
-#   Type: sort order
-#   Default: alpha
+#Type: sort order
+#Default: alpha
 #
-#   Specifies how to sort entries in the file browser. By default, the
-#   entries are sorted alphabetically. Valid values:
+#Specifies how to sort entries in the file browser. By default, the entries are
+#sorted alphabetically. Valid values:
 #
 #   alpha (alphabetically)
 #   date
 #   size
 #   unsorted
 #
-#   You may optionally use the reverse- prefix to specify reverse sorting
-#   order (example: set sort_browser=reverse-date).
+#
+#You may optionally use the reverse- prefix to specify reverse sorting order
+#(example: set sort_browser=reverse-date).
 #
 #  sort_re
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   This variable is only useful when sorting by threads with
-#   ``$strict_threads'' unset. In that case, it changes the heuristic mutt
-#   uses to thread messages by subject. With sort_re set, mutt will only
-#   attach a message as the child of another message by subject if the
-#   subject of the child message starts with a substring matching the
-#   setting of ``$reply_regexp''. With sort_re unset, mutt will attach the
-#   message whether or not this is the case, as long as the
-#   non-``$reply_regexp'' parts of both messages are identical.
+#This variable is only useful when sorting by threads with ``$strict_threads''
+#unset. In that case, it changes the heuristic mutt uses to thread messages by
+#subject. With sort_re set, mutt will only attach a message as the child of
+#another message by subject if the subject of the child message starts with a
+#substring matching the setting of ``$reply_regexp''. With sort_re unset, mutt
+#will attach the message whether or not this is the case, as long as the non-``
+#$reply_regexp'' parts of both messages are identical.
 #
 #  spam_separator
 #
-#   Type: string
-#   Default: ","
+#Type: string
+#Default: ","
 #
-#   ``spam_separator'' controls what happens when multiple spam headers
-#   are matched: if unset, each successive header will overwrite any
-#   previous matches value for the spam label. If set, each successive
-#   match will append to the previous, using ``spam_separator'' as a
-#   separator.
+#``spam_separator'' controls what happens when multiple spam headers are
+#matched: if unset, each successive header will overwrite any previous matches
+#value for the spam label. If set, each successive match will append to the
+#previous, using ``spam_separator'' as a separator.
 #
 #  spoolfile
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   If your spool mailbox is in a non-default place where Mutt cannot find
-#   it, you can specify its location with this variable. Mutt will
-#   automatically set this variable to the value of the environment
-#   variable $MAIL if it is not set.
+#If your spool mailbox is in a non-default place where Mutt cannot find it, you
+#can specify its location with this variable. Mutt will automatically set this
+#variable to the value of the environment variable $MAIL if it is not set.
 #
 #  status_chars
 #
-#   Type: string
-#   Default: "-*%A"
+#Type: string
+#Default: "-*%A"
 #
-#   Controls the characters used by the "%r" indicator in
-#   ``$status_format''. The first character is used when the mailbox is
-#   unchanged. The second is used when the mailbox has been changed, and
-#   it needs to be resynchronized. The third is used if the mailbox is in
-#   read-only mode, or if the mailbox will not be written when exiting
-#   that mailbox (You can toggle whether to write changes to a mailbox
-#   with the toggle-write operation, bound by default to "%"). The fourth
-#   is used to indicate that the current folder has been opened in attach-
-#   message mode (Certain operations like composing a new mail, replying,
-#   forwarding, etc. are not permitted in this mode).
+#Controls the characters used by the "%r" indicator in ``$status_format''. The
+#first character is used when the mailbox is unchanged. The second is used when
+#the mailbox has been changed, and it needs to be resynchronized. The third is
+#used if the mailbox is in read-only mode, or if the mailbox will not be written
+#when exiting that mailbox (You can toggle whether to write changes to a mailbox
+#with the toggle-write operation, bound by default to "%"). The fourth is used
+#to indicate that the current folder has been opened in attach- message mode
+#(Certain operations like composing a new mail, replying, forwarding, etc. are
+#not permitted in this mode).
 #
 #  status_format
 #
-#   Type: string
-#   Default: "-%r-Mutt: %f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? De
-#   l:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s
-#   /%S)-%>-(%P)---"
+#Type: string
+#Default: "-%r-Mutt: %f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F?
+#Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---"
 #
-#   Controls the format of the status line displayed in the index menu.
-#   This string is similar to ``$index_format'', but has its own set of
-#   printf()-like sequences:
+#Controls the format of the status line displayed in the index menu. This string
+#is similar to ``$index_format'', but has its own set of printf()-like
+#sequences:
 #
-#   %b
-#          number of mailboxes with new mail *
+#%b
 #
-#   %d
-#          number of deleted messages *
+#    number of mailboxes with new mail *
 #
-#   %f
-#          the full pathname of the current mailbox
+#%d
 #
-#   %F
-#          number of flagged messages *
+#    number of deleted messages *
 #
-#   %h
-#          local hostname
+#%f
 #
-#   %l
-#          size (in bytes) of the current mailbox *
+#    the full pathname of the current mailbox
 #
-#   %L
-#          size (in bytes) of the messages shown (i.e., which match the
-#          current limit) *
+#%F
 #
-#   %m
-#          the number of messages in the mailbox *
+#    number of flagged messages *
 #
-#   %M
-#          the number of messages shown (i.e., which match the current
-#          limit) *
+#%h
 #
-#   %n
-#          number of new messages in the mailbox *
+#    local hostname
 #
-#   %o
-#          number of old unread messages *
+#%l
 #
-#   %p
-#          number of postponed messages *
+#    size (in bytes) of the current mailbox *
 #
-#   %P
-#          percentage of the way through the index
+#%L
 #
-#   %r
-#          modified/read-only/won't-write/attach-message indicator,
-#          according to $status_chars
+#    size (in bytes) of the messages shown (i.e., which match the current limit)
+#    *
 #
-#   %s
-#          current sorting mode ($sort)
+#%m
 #
-#   %S
-#          current aux sorting method ($sort_aux)
+#    the number of messages in the mailbox *
 #
-#   %t
-#          number of tagged messages *
+#%M
 #
-#   %u
-#          number of unread messages *
+#    the number of messages shown (i.e., which match the current limit) *
 #
-#   %v
-#          Mutt version string
+#%n
 #
-#   %V
-#          currently active limit pattern, if any *
+#    number of new messages in the mailbox *
 #
-#   %>X
-#          right justify the rest of the string and pad with "X"
+#%o
 #
-#   %|X
-#          pad to the end of the line with "X"
+#    number of old unread messages *
 #
-#   * = can be optionally printed if nonzero
+#%p
 #
-#   Some of the above sequences can be used to optionally print a string
-#   if their value is nonzero. For example, you may only want to see the
-#   number of flagged messages if such messages exist, since zero is not
-#   particularly meaningful. To optionally print a string based upon one
-#   of the above sequences, the following construct is used:
+#    number of postponed messages *
 #
-#   %?<sequence_char>?<optional_string>?
+#%P
 #
-#   where sequence_char is a character from the table above, and
-#   optional_string is the string you would like printed if sequence_char
-#   is nonzero. optional_string may contain other sequences as well as
-#   normal text, but you may not nest optional strings.
+#    percentage of the way through the index
 #
-#   Here is an example illustrating how to optionally print the number of
-#   new messages in a mailbox: %?n?%n new messages.?
+#%r
 #
-#   You can also switch between two strings using the following construct:
+#    modified/read-only/won't-write/attach-message indicator, according to
+#    $status_chars
 #
-#   %?<sequence_char>?<if_string>&<else_string>?
+#%s
 #
-#   If the value of sequence_char is non-zero, if_string will be expanded,
-#   otherwise else_string will be expanded.
+#    current sorting mode ($sort)
 #
-#   You can force the result of any printf-like sequence to be lowercase
-#   by prefixing the sequence character with an underscore (_) sign. For
-#   example, if you want to display the local hostname in lowercase, you
-#   would use: %_h
+#%S
 #
-#   If you prefix the sequence character with a colon (:) character, mutt
-#   will replace any dots in the expansion by underscores. This might be
-#   helpful with IMAP folders that don't like dots in folder names.
+#    current aux sorting method ($sort_aux)
+#
+#%t
+#
+#    number of tagged messages *
+#
+#%u
+#
+#    number of unread messages *
+#
+#%v
+#
+#    Mutt version string
+#
+#%V
+#
+#    currently active limit pattern, if any *
+#
+#%>X
+#
+#    right justify the rest of the string and pad with "X"
+#
+#%|X
+#
+#    pad to the end of the line with "X"
+#
+#%*X
+#
+#    soft-fill with character "X" as pad
+#
+#For an explanation of `soft-fill', see the ``$index_format'' documentation.
+#
+#* = can be optionally printed if nonzero
+#
+#Some of the above sequences can be used to optionally print a string if their
+#value is nonzero. For example, you may only want to see the number of flagged
+#messages if such messages exist, since zero is not particularly meaningful. To
+#optionally print a string based upon one of the above sequences, the following
+#construct is used:
+#
+#%?<sequence_char>?<optional_string>?
+#
+#where sequence_char is a character from the table above, and optional_string is
+#the string you would like printed if sequence_char is nonzero. optional_string
+#may contain other sequences as well as normal text, but you may not nest
+#optional strings.
+#
+#Here is an example illustrating how to optionally print the number of new
+#messages in a mailbox: %?n?%n new messages.?
+#
+#You can also switch between two strings using the following construct:
+#
+#%?<sequence_char>?<if_string>&<else_string>?
+#
+#If the value of sequence_char is non-zero, if_string will be expanded,
+#otherwise else_string will be expanded.
+#
+#You can force the result of any printf-like sequence to be lowercase by
+#prefixing the sequence character with an underscore (_) sign. For example, if
+#you want to display the local hostname in lowercase, you would use: %_h
+#
+#If you prefix the sequence character with a colon (:) character, mutt will
+#replace any dots in the expansion by underscores. This might be helpful with
+#IMAP folders that don't like dots in folder names.
 #
 #  status_on_top
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Setting this variable causes the ``status bar'' to be displayed on the
-#   first line of the screen rather than near the bottom.
+#Setting this variable causes the ``status bar'' to be displayed on the first
+#line of the screen rather than near the bottom.
 #
 #  strict_threads
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   If set, threading will only make use of the ``In-Reply-To'' and
-#   ``References'' fields when you ``$sort'' by message threads. By
-#   default, messages with the same subject are grouped together in
-#   ``pseudo threads.''. This may not always be desirable, such as in a
-#   personal mailbox where you might have several unrelated messages with
-#   the subject ``hi'' which will get grouped together. See also
-#   ``$sort_re'' for a less drastic way of controlling this behaviour.
+#If set, threading will only make use of the ``In-Reply-To'' and ``References''
+#fields when you ``$sort'' by message threads. By default, messages with the
+#same subject are grouped together in ``pseudo threads.''. This may not always
+#be desirable, such as in a personal mailbox where you might have several
+#unrelated messages with the subject ``hi'' which will get grouped together. See
+#also ``$sort_re'' for a less drastic way of controlling this behaviour.
 #
 #  suspend
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When unset, mutt won't stop when the user presses the terminal's susp
-#   key, usually ``control-Z''. This is useful if you run mutt inside an
-#   xterm using a command like xterm -e mutt.
+#When unset, mutt won't stop when the user presses the terminal's susp key,
+#usually ``control-Z''. This is useful if you run mutt inside an xterm using a
+#command like xterm -e mutt.
 #
 #  text_flowed
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will generate text/plain; format=flowed attachments.
-#   This format is easier to handle for some mailing software, and
-#   generally just looks like ordinary text. To actually make use of this
-#   format's features, you'll need support in your editor.
+#When set, mutt will generate text/plain; format=flowed attachments. This format
+#is easier to handle for some mailing software, and generally just looks like
+#ordinary text. To actually make use of this format's features, you'll need
+#support in your editor.
 #
-#   Note that $indent_string is ignored when this option is set.
+#Note that $indent_string is ignored when this option is set.
 #
 #  thread_received
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt uses the date received rather than the date sent to
-#   thread messages by subject.
+#When set, mutt uses the date received rather than the date sent to thread
+#messages by subject.
 #
 #  thorough_search
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Affects the ~b and ~h search operations described in section
-#   ``patterns'' above. If set, the headers and attachments of messages to
-#   be searched are decoded before searching. If unset, messages are
-#   searched as they appear in the folder.
+#Affects the ~b and ~h search operations described in section ``patterns''
+#above. If set, the headers and attachments of messages to be searched are
+#decoded before searching. If unset, messages are searched as they appear in the
+#folder.
 #
 #  tilde
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, the internal-pager will pad blank lines to the bottom of the
-#   screen with a tilde (~).
+#When set, the internal-pager will pad blank lines to the bottom of the screen
+#with a tilde (~).
+#
+#  time_inc
+#
+#Type: number
+#Default: 0
+#
+#Along with ``read_inc'', ``write_inc'', and ``net_inc'', this variable controls
+#the frequency with which progress updates are displayed. It suppresses updates
+#less than ``time_inc'' milliseconds apart. This can improve throughput on
+#systems with slow terminals, or when running mutt on a remote system.
 #
 #  timeout
 #
-#   Type: number
-#   Default: 600
+#Type: number
+#Default: 600
 #
-#   This variable controls the number of seconds Mutt will wait for a key
-#   to be pressed in the main menu before timing out and checking for new
-#   mail. A value of zero or less will cause Mutt to never time out.
+#When Mutt is waiting for user input either idleing in menus or in an
+#interactive prompt, Mutt would block until input is present. Depending on the
+#context, this would prevent certain operations from working, like checking for
+#new mail or keeping an IMAP connection alive.
+#
+#This variable controls how many seconds Mutt will at most wait until it aborts
+#waiting for input, performs these operations and continues to wait for input.
+#
+#A value of zero or less will cause Mutt to never time out.
 #
 #  tmpdir
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   This variable allows you to specify where Mutt will place its
-#   temporary files needed for displaying and composing messages. If this
-#   variable is not set, the environment variable TMPDIR is used. If
-#   TMPDIR is not set then "/tmp" is used.
+#This variable allows you to specify where Mutt will place its temporary files
+#needed for displaying and composing messages. If this variable is not set, the
+#environment variable TMPDIR is used. If TMPDIR is not set then "/tmp" is used.
 #
 #  to_chars
 #
-#   Type: string
-#   Default: " +TCFL"
+#Type: string
+#Default: " +TCFL"
 #
-#   Controls the character used to indicate mail addressed to you. The
-#   first character is the one used when the mail is NOT addressed to your
-#   address (default: space). The second is used when you are the only
-#   recipient of the message (default: +). The third is when your address
-#   appears in the TO header field, but you are not the only recipient of
-#   the message (default: T). The fourth character is used when your
-#   address is specified in the CC header field, but you are not the only
-#   recipient. The fifth character is used to indicate mail that was sent
-#   by you. The sixth character is used to indicate when a mail was sent
-#   to a mailing-list you subscribe to (default: L).
+#Controls the character used to indicate mail addressed to you. The first
+#character is the one used when the mail is NOT addressed to your address
+#(default: space). The second is used when you are the only recipient of the
+#message (default: +). The third is when your address appears in the TO header
+#field, but you are not the only recipient of the message (default: T). The
+#fourth character is used when your address is specified in the CC header field,
+#but you are not the only recipient. The fifth character is used to indicate
+#mail that was sent by you. The sixth character is used to indicate when a mail
+#was sent to a mailing-list you subscribe to (default: L).
 #
 #  tunnel
 #
-#   Type: string
-#   Default: ""
+#Type: string
+#Default: ""
 #
-#   Setting this variable will cause mutt to open a pipe to a command
-#   instead of a raw socket. You may be able to use this to set up
-#   preauthenticated connections to your IMAP/POP3 server. Example:
+#Setting this variable will cause mutt to open a pipe to a command instead of a
+#raw socket. You may be able to use this to set up preauthenticated connections
+#to your IMAP/POP3 server. Example:
 #
-#   tunnel="ssh -q mailhost.net /usr/local/libexec/imapd"
+#tunnel="ssh -q mailhost.net /usr/local/libexec/imapd"
 #
-#   NOTE: For this example to work you must be able to log in to the
-#   remote machine without having to enter a password.
+#NOTE: For this example to work you must be able to log in to the remote machine
+#without having to enter a password.
 #
 #  use_8bitmime
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   Warning: do not set this variable unless you are using a version of
-#   sendmail which supports the -B8BITMIME flag (such as sendmail 8.8.x)
-#   or you may not be able to send mail.
+#Warning: do not set this variable unless you are using a version of sendmail
+#which supports the -B8BITMIME flag (such as sendmail 8.8.x) or you may not be
+#able to send mail.
 #
-#   When set, Mutt will invoke ``$sendmail'' with the -B8BITMIME flag when
-#   sending 8-bit messages to enable ESMTP negotiation.
+#When set, Mutt will invoke ``$sendmail'' with the -B8BITMIME flag when sending
+#8-bit messages to enable ESMTP negotiation.
 #
 #  use_domain
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will qualify all local addresses (ones without the
-#   @host portion) with the value of ``$hostname''. If unset, no addresses
-#   will be qualified.
+#When set, Mutt will qualify all local addresses (ones without the @host
+#portion) with the value of ``$hostname''. If unset, no addresses will be
+#qualified.
 #
 #  use_envelope_from
 #
-#   Type: boolean
-#   Default: no
+#Type: boolean
+#Default: no
 #
-#   When set, mutt will use ``$envelope_from_address'' as the envelope
-#   sender if that is set, otherwise it will attempt to derive it from the
-#   "From:" header. Note that this information is passed to sendmail
-#   command using the "-f" command line switch, so don't set this option
-#   if you are using that switch in $sendmail yourself, or if the sendmail
-#   on your machine doesn't support that command line switch.
+#When set, mutt will set the envelope sender of the message. If ``
+#$envelope_from_address'' is set, it will be used as the sender address. If not,
+#mutt will attempt to derive the sender from the "From:" header.
+#
+#Note that this information is passed to sendmail command using the "-f" command
+#line switch. Therefore setting this option is not useful if the ``$sendmail''
+#variable already contains "-f" or if the executable pointed to by $sendmail
+#doesn't support the "-f" switch.
 #
 #  use_from
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will generate the `From:' header field when sending
-#   messages. If unset, no `From:' header field will be generated unless
-#   the user explicitly sets one using the ``my_hdr'' command.
+#When set, Mutt will generate the `From:' header field when sending messages. If
+#unset, no `From:' header field will be generated unless the user explicitly
+#sets one using the ``my_hdr'' command.
 #
 #  use_idn
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will show you international domain names decoded. Note:
-#   You can use IDNs for addresses even if this is unset. This variable
-#   only affects decoding.
+#When set, Mutt will show you international domain names decoded. Note: You can
+#use IDNs for addresses even if this is unset. This variable only affects
+#decoding.
 #
 #  use_ipv6
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, Mutt will look for IPv6 addresses of hosts it tries to
-#   contact. If this option is unset, Mutt will restrict itself to IPv4
-#   addresses. Normally, the default should work.
+#When set, Mutt will look for IPv6 addresses of hosts it tries to contact. If
+#this option is unset, Mutt will restrict itself to IPv4 addresses. Normally,
+#the default should work.
 #
 #  user_agent
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will add a "User-Agent" header to outgoing messages,
-#   indicating which version of mutt was used for composing them.
+#When set, mutt will add a "User-Agent" header to outgoing messages, indicating
+#which version of mutt was used for composing them.
 #
 #  visual
 #
-#   Type: path
-#   Default: ""
+#Type: path
+#Default: ""
 #
-#   Specifies the visual editor to invoke when the ~v command is given in
-#   the builtin editor.
+#Specifies the visual editor to invoke when the ~v command is given in the
+#builtin editor.
 #
 #  wait_key
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether Mutt will ask you to press a key after shell- escape,
-#   pipe-message, pipe-entry, print-message, and print-entry commands.
+#Controls whether Mutt will ask you to press a key after shell- escape,
+#pipe-message, pipe-entry, print-message, and print-entry commands.
 #
-#   It is also used when viewing attachments with ``auto_view'', provided
-#   that the corresponding mailcap entry has a needsterminal flag, and the
-#   external program is interactive.
+#It is also used when viewing attachments with ``auto_view'', provided that the
+#corresponding mailcap entry has a needsterminal flag, and the external program
+#is interactive.
 #
-#   When set, Mutt will always ask for a key. When unset, Mutt will wait
-#   for a key only if the external command returned a non-zero status.
+#When set, Mutt will always ask for a key. When unset, Mutt will wait for a key
+#only if the external command returned a non-zero status.
 #
 #  weed
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   When set, mutt will weed headers when displaying, forwarding,
-#   printing, or replying to messages.
+#When set, mutt will weed headers when displaying, forwarding, printing, or
+#replying to messages.
 #
 #  wrap
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   When set to a positive value, mutt will wrap text at $wrap characters.
-#   When set to a negative value, mutt will wrap text so that there are
-#   $wrap characters of empty space on the right side of the terminal.
+#When set to a positive value, mutt will wrap text at $wrap characters. When set
+#to a negative value, mutt will wrap text so that there are $wrap characters of
+#empty space on the right side of the terminal.
 #
 #  wrap_search
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether searches wrap around the end of the mailbox.
+#Controls whether searches wrap around the end of the mailbox.
 #
-#   When set, searches will wrap around the first (or last) message. When
-#   unset, searches will not wrap.
+#When set, searches will wrap around the first (or last) message. When unset,
+#searches will not wrap.
 #
 #  wrapmargin
 #
-#   Type: number
-#   Default: 0
+#Type: number
+#Default: 0
 #
-#   (DEPRECATED) Equivalent to setting wrap with a negative value.
+#(DEPRECATED) Equivalent to setting wrap with a negative value.
 #
 #  write_inc
 #
-#   Type: number
-#   Default: 10
+#Type: number
+#Default: 10
 #
-#   When writing a mailbox, a message will be printed every write_inc
-#   messages to indicate progress. If set to 0, only a single message will
-#   be displayed before writing a mailbox.
+#When writing a mailbox, a message will be printed every write_inc messages to
+#indicate progress. If set to 0, only a single message will be displayed before
+#writing a mailbox.
 #
-#   Also see the ``$read_inc'' variable.
+#Also see the ``$read_inc'' variable.
 #
 #  write_bcc
 #
-#   Type: boolean
-#   Default: yes
+#Type: boolean
+#Default: yes
 #
-#   Controls whether mutt writes out the Bcc header when preparing
-#   messages to be sent. Exim users may wish to unset this. If mutt is set
-#   to deliver directly via SMTP (see ``$smtp_url''), this option does
-#   nothing: mutt will never write out the BCC header in this case.
+#Controls whether mutt writes out the Bcc header when preparing messages to be
+#sent. Exim users may wish to unset this. If mutt is set to deliver directly via
+#SMTP (see ``$smtp_url''), this option does nothing: mutt will never write out
+#the BCC header in this case.
 #
+#  END

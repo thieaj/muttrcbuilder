@@ -1,5 +1,12 @@
 Revision history for Perl script muttrcbuilder.
 
-0.01  Sat Apr  7 19:39:35 2007
+0.2   Sat Aug  1 17:09:30 2009
+	- replace the CGI with Mason templates
+	- update mutt configs
+	- added POD documentation
+	- removed get_ from method names
+	- updated mutt versions included
+
+0.1   Sat Apr  7 19:39:35 2007
 	- packaged for download from website source
 

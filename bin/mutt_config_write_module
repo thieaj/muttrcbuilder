@@ -49,11 +49,14 @@ open(my $lh, "-|", "lynx", "-dump", $txtf) or die("Error opening lynx: $!");
 
 my $in_vars = 0;
 
+my $prev = "";
+
 while(<$lh>) {
 	if (m/^\d+\. /) { $in_vars = 0; }
-	if (m/^\d+\. Configuration variables/) { $in_vars = 1; }
+	if (m/^\d+\. Configuration [Vv]ariables/ and $prev !~ m/\S/) { $in_vars = 1; }
 	elsif ($in_vars and m/^\d+\.\d+\. (.*)/) { print $op "#  $1\n"; }
 	elsif ($in_vars) { print $op "#$_"; }
+	$prev = $_;
 }
 
 close($lh) or die("Error closing lynx: $!");
@@ -103,6 +106,8 @@ $VARIABLES = {
 </xsl:template>
 
 <xsl:template match="para">&lt;p&gt;<xsl:apply-templates />&lt;/p&gt;</xsl:template>
+<xsl:template match="literal"><xsl:apply-templates /></xsl:template>
+<xsl:template match="quote">&lt;tt&gt;<xsl:apply-templates />&lt;/tt&gt;</xsl:template>
 <xsl:template match="emphasis">&lt;em&gt;<xsl:apply-templates />&lt;/em&gt;</xsl:template>
 <xsl:template match="link">&lt;a href="http://www.mutt.org/doc/manual/manual-6.html#<xsl:value-of select="@linkend" />"&gt;<xsl:apply-templates />&lt;/a&gt;</xsl:template>
 <xsl:template match="variablelist">
@@ -113,6 +118,17 @@ $VARIABLES = {
 <xsl:template match="varlistentry"><xsl:apply-templates /></xsl:template>
 <xsl:template match="term">&lt;dt&gt;&lt;strong&gt;<xsl:apply-templates />&lt;/strong&gt;&lt;/dt&gt;</xsl:template>
 <xsl:template match="listitem">&lt;dd&gt;<xsl:apply-templates />&lt;/dd&gt;</xsl:template>
+<xsl:template match="informaltable">&lt;table&gt;<xsl:apply-templates />&lt;/table&gt;</xsl:template>
+<xsl:template match="row">&lt;tr&gt;<xsl:apply-templates />&lt;/tr&gt;</xsl:template>
+<xsl:template match="entry">&lt;td&gt;<xsl:apply-templates />&lt;/td&gt;</xsl:template>
+<xsl:template match="tbody"><xsl:apply-templates /></xsl:template>
+<xsl:template match="tgroup"><xsl:apply-templates /></xsl:template>
+<xsl:template match="itemizedlist">&lt;ul&gt;
+<xsl:for-each select="listitem">
+&lt;li&gt;<xsl:apply-templates />&lt;/li&gt;
+</xsl:for-each>
+&lt;/ul&gt;
+</xsl:template>
 <xsl:template match="screen">&lt;pre&gt;
 <xsl:apply-templates />
 &lt;/pre&gt;

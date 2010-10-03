@@ -1,4 +1,4 @@
-package Mutt::Config::Version::v1_4_2_1;
+package Mutt::Config::Version::v1_4_2;
 
 $VARIABLES = {
           'save_empty' => {

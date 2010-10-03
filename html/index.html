@@ -1,0 +1,47 @@
+<%once>
+ use Mutt::Config;
+</%once>
+<&| components.html:page &>
+ <p>
+   This site lets you create a <tt>muttrc</tt> configuration file for
+   the <a href="http://www.mutt.org/">Mutt email program</a>. You
+   specify your preferences in the boxes on the next few pages, and
+   you get a muttrc you can use.
+ </p>
+ <p>
+   None of the data you enter is stored, but as the Internet is not
+   secure, <strong>you should not enter any sensitive information such
+   as passwords</strong>. Enter a placeholder instead (such as
+   &quot;password goes here&quot; and replace it in the file you
+   download.
+ </p>
+ <p>
+   The idea is based on netliberte's sadly-defunct muttrc builder.
+ </p>
+
+ <h2>Ready? Let's Begin</h2>
+ <p>
+   To start, please select which version of mutt you want to generate
+   a config file for. If your version isn't listed, select the one
+   with the closest version number.
+ </p>
+
+ <form method="post" action="dispatch.html">
+   <p>
+     <select name="version">
+% foreach my $v (sort Mutt::Config->versions()) {
+       <option value="<% $v | h %>">mutt-<% $v | h %></option>
+% }
+     </select>
+     <input type="submit" value="Next" />
+   </p>
+ </form>
+
+ <hr />
+
+ <p>
+   This service is provided in the hope that you'll find it useful,
+   but no warranty is offered. The source code is
+   <a href="http://www.muttrcbuilder.org/source/muttrcbuilder-0.02.tar.gz">available</a>.
+ </p>
+</&>
