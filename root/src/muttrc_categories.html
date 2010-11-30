@@ -1,0 +1,16 @@
+<%args>
+$mutt # Mutt::Config we're building for
+</%args>
+<& muttrc_header.mas, mutt => $mutt &>
+%   foreach my $cat (sort $mutt->categories()) {
+##########
+# Category <% $cat %>
+##########
+
+%     foreach my $c (sort keys %{ $mutt->variables($cat) }) {
+%       my $obj = $mutt->variable($c);
+%       $m->comp("build_variable.mas", option => $obj, always => 1);
+%     }
+
+%   }
+<& muttrc_footer.mas, mutt => $mutt &>

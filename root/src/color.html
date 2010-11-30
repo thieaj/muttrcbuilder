@@ -1,6 +1,4 @@
 <%once>
-use Mutt::Config;
-
 # Mapping of mutt colours to CSS
 my %colors = (
   white         => "grey",
@@ -40,30 +38,25 @@ my %default_colours = (
 );
 </%once>
 <%args>
-  $version # Version of mutt we're configuring
-  $args    # %ARGS from dispatch.html
+  $mutt # Mutt::Config we're configuring for
 </%args>
 <%init>
-  die("Invalid version") if ($version =~ m/[^0-9A-Za-z_.-]/);
-  die("Invalid args")    unless ref $args;
-  my $config = Mutt::Config->new($version);
-
   # Make a chunk of CSS to describe the colours currently in effect
   my $style = "";
   foreach my $o (sort keys %default_colours) {
     my ($fg, $bg)=@{$default_colours{$o}};
     # Override defaults if user configured them previously
-    if ($args->{"col_fg_$o"}) { $fg = $args->{"col_fg_$o"}; }
-    if ($args->{"col_bg_$o"}) { $bg = $args->{"col_bg_$o"}; }
+    if ($c->session->{"col_fg_$o"}) { $fg = $c->session->{"col_fg_$o"}; }
+    if ($c->session->{"col_bg_$o"}) { $bg = $c->session->{"col_bg_$o"}; }
     $style .= ".$o {";
     $style .= " color: " . $colors{$fg} . ";"            if ($fg ne "default");
     $style .= " background-color: " . $colors{$bg} . ";" if ($bg ne "default");
     $style .= " }\n";
   }
 </%init>
-<&| components.html:page, style => $style &>
-<form method="post" action="dispatch.html">
-<& components.html:page_chooser, mutt => $config, current_page => "_color" &>
+<&| layout.mas, style => $style &>
+<form method="post" action="<% $c->uri_for("/page") %>">
+<& navbar.mas, mutt => $mutt, current_page => "_color" &>
 <pre class="normal">
 <span class="status">i:Exit  -:PrevPg  <Space>:NextPg v:View Attachm.  d:Del  r:Reply  j:Next ?:Help        </span>
 
@@ -75,8 +68,8 @@ my %default_colours = (
 <span class="status">-*-Mutt: imap://euphrates/INBOX [Msgs:29]---(threads/date)--------------(end)---</span>
 <span class="hdrdefault">
 Date: Thu, 28 Jul 2005 16:26:37 +0100                                           
-From: A friend <friend@example.com>                                                                 
-To: Me <me@example.org>                                                                         
+From: A friend &lt;friend@example.com&gt;                                                                 
+To: Me &lt;me@example.org&gt;                                                                         
 Subject: New email                                                              
 User-Agent: Mutt/1.5.9i                                                         
 X-SA-Exim-Scanned: No (on mail.example.com); Mail filter running algorithm was  
@@ -84,7 +77,7 @@ X-SA-Exim-Scanned: No (on mail.example.com); Mail filter running algorithm was
 X-Delivered-To: me@example.org                                                  
 </span>
                                                                                 
-<span class="quoted">> Test message                                                                  </span>
+<span class="quoted">&gt; Test message                                                                  </span>
 
 Yes <span class="search">that</span> works.                                                                 
 <span class="signature">--                                                                              
@@ -105,8 +98,8 @@ Foo Bar                                  Acme Widgets Ltd                       
   </tr>
 % foreach my $o (sort keys %default_colours) {
 %   my ($fg, $bg)=@{$default_colours{$o}};
-%   if ($args->{"col_fg_$o"}) { $fg = $args->{"col_fg_$o"}; }
-%   if ($args->{"col_bg_$o"}) { $bg = $args->{"col_bg_$o"}; }
+%   if ($c->session->{"col_fg_$o"}) { $fg = $c->session->{"col_fg_$o"}; }
+%   if ($c->session->{"col_bg_$o"}) { $bg = $c->session->{"col_bg_$o"}; }
   <tr>
     <td><% $o | h %></td>
     <td><& SELF:colour_select, name => "col_fg_$o", color => $fg &></td>
@@ -114,7 +107,6 @@ Foo Bar                                  Acme Widgets Ltd                       
   </tr>
 %   }
 </table>
-<& components.html:copy_over_hidden_fields, args => $args, mutt => $config, page => "_color" &>
 </form>
 <hr />
 </&>

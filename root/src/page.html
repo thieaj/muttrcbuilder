@@ -1,0 +1,38 @@
+<%args>
+    $page    # Which page we're displaying
+    $mutt    # Mutt::Config for this version
+</%args>
+<&| layout.mas &>
+<form method="post" action="<% $c->uri_for("/page") %>">
+<& navbar.mas, mutt => $mutt, current_page => $page &>
+% my $commands = $mutt->variables($page);
+% foreach my $co (sort keys %$commands) {
+%   my $command = $commands->{$co}; 
+%   my $default = $command->default();
+%   $default =~ s/&quot;/"/g;    # Sort out quote marks
+%   $default =~ s/^"(.*)"$/$1/g; # Remove wrapping quotes
+  <h3><% $co %></h3>
+  <p>
+    <strong>Type:</strong>    <% $command->type() | h %>
+    <strong>Default:</strong> "<% $default | h %>"
+  </p>
+  <div class="htmldesc">
+    <% $command->html_description() %>
+  </div>
+%   my $value = exists($c->session->{"opt_$co"}) ? $c->session->{"opt_$co"} : $command->default();
+%   if (my @possibles = $command->possible_values()) {
+    <select name="opt_<% $co %>">
+%     foreach my $poss (@possibles) {
+      <option <% ($value eq $poss) ? "selected='selected'" : "" %>><% $poss | h %></option>
+%     }
+    </select>
+%   } else {
+%     $value =~ s/&quot;/"/g;
+%     $value =~ s/^"(.*)"$/$1/g;
+      <input name="opt_<% $co | h %>" value="<% $value | h %>" />
+%   }
+
+% }
+</form>
+<hr />
+</&>

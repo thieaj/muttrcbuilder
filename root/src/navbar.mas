@@ -1,0 +1,22 @@
+% # Render the page-change drop-down at the top of each page
+<%args>
+  $mutt         # Mutt::Config object to operate on
+  $current_page # What page are we on now?
+</%args>
+    <hr />
+    <p>
+      <strong>Change page:</strong>
+      <select name="page">
+% foreach my $p (sort $mutt->categories()) { # Possible pages
+        <option <% ($p eq $current_page) ?
+          "selected='selected'" : "" %>><% $p %></option>
+% }
+        <option value="_color" <% ($current_page eq "_color") ?
+          "selected='selected'" : "" %>>color</option>
+        <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
+      </select>
+      <input type="submit" value="Change" /><br />
+      Once you're done, select <tt>finish &AMP; build muttrc</tt> from
+      the list above.
+    </p>
+    <hr />

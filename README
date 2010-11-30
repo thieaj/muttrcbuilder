@@ -5,14 +5,14 @@ This is the code used to run http://www.muttrcbuilder.org/. It provides
 an easy way to create muttrc files for the mutt email client
 (http://www.mutt.org/).
 
+Run script/mutt_config_builder_server.pl to test the application.
+
 The builder uses a series of modules under Mutt::Config to load
 information on configuration variables supported by different versions
 of mutt - actual information is under Mutt::Config::Version.
 
-The main builder is a series of HTML::Mason templates under html/.
-
 There is a program to take a mutt manual.xml and manual.txt and turn
-it into a Mutt::Config::Version module, in bin/mutt_config_write_module
+it into a Mutt::Config::Version module, in script/mutt_config_write_module.pl
 
 INSTALLATION
 
@@ -27,14 +27,19 @@ DEPENDENCIES
 
 These programs require perl v5.6.0 or greater.
 
-The builder requires HTML::Mason.
+The builder requires Catalyst, Catalyst::Action::RenderView,
+Catalyst::Plugin::ConfigLoader, Catalyst::Plugin::Session,
+Catalyst::Plugin::Session::State::Cookie,
+Catalyst::Plugin::Session::Store::FastMmap
+Catalyst::Plugin::Unicode::Encoding, Catalyst::View::Mason and
+Module::Pluggable.
 
 The mutt_config_write_module script requires XML::LibXML, XML::LibXSLT
 and the lynx web browser in your path.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2009 by Luke Ross
+Copyright (C) 2005-2010 by Luke Ross
 
 The included mutt documentation is extracted directly from the mutt
 distributions and is:

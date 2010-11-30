@@ -1,18 +1,31 @@
-use 5.006;
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    NAME              => 'muttrcbuilder',
-    VERSION_FROM      => 'lib/Mutt/Config.pm', # finds $VERSION
-    PREREQ_PM         => {
-        "Data::Dumper"      => 0,
-        "HTML::Mason"       => 0,
-        "Module::Pluggable" => 0,
-        "XML::LibXML"       => 0,
-        "XML::LibXSLT"      => 0,
-    },
-    EXE_FILES         => [ "bin/mutt_config_write_module" ],
-#   ABSTRACT_FROM     => 'lib/Mutt/Config.pm', # retrieve abstract from module
-    AUTHOR            => 'Luke Ross <luke@lukeross.name>'
-);
+#!/usr/bin/env perl
+# IMPORTANT: if you delete this file your app will not work as
+# expected.  You have been warned.
+use inc::Module::Install;
+use Module::Install::Catalyst; # Complain loudly if you don't have
+                               # Catalyst::Devel installed or haven't said
+                               # 'make dist' to create a standalone tarball.
+
+name 'Mutt-Config-Builder';
+all_from 'lib/Mutt/Config/Builder.pm';
+
+requires 'Config::General';
+requires 'Catalyst::Runtime' => '5.70';
+requires 'Catalyst::Action::RenderView';
+requires 'Catalyst::Plugin::ConfigLoader';
+requires 'Catalyst::Plugin::Session';
+requires 'Catalyst::Plugin::Session::State::Cookie';
+requires 'Catalyst::Plugin::Session::Store::FastMmap';
+requires 'Catalyst::Plugin::Static::Simple';
+requires 'Catalyst::Plugin::Unicode::Encoding'; # Can use Catalyst::Plugin::Unicode
+                                                # on older versions of Catalyst:w
+requires 'Catalyst::View::Mason';
+requires 'Module::Pluggable';
+requires 'XML::LibXML';
+requires 'XML::LibXSLT';
+test_requires 'Test::More' => '0.88';
+catalyst;
+
+install_script glob('script/*.pl');
+auto_install;
+WriteAll;

@@ -105,6 +105,13 @@ sub variables {
 	return \%toreturn;
 }
 
+sub version {
+	my ($self) = @_;
+	my $v = $self->{version};
+	$v =~ s/_/./g;
+	return $v;
+}
+
 1;
 __END__
 
@@ -156,6 +163,11 @@ Returns a list of available categories of options (strings).
 Returns the text-formatted mutt configuration options reference manual
 for this version of mutt.
 
+=head2 version()
+
+Returns the version of the Mutt this L<Mutt::Config> object is
+configuring for.
+
 =head1 SEE ALSO
 
 =over
@@ -176,7 +188,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2009 by Luke Ross
+Copyright (C) 2005-2010 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

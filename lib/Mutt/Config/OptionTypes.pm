@@ -24,11 +24,11 @@ sub possible_values {
 		}
 
 		if ($_ eq "sort_browser") {
-			return _reverse qw(alpha date size unsorted);
+			return _reverse(qw(alpha date size unsorted));
 		}
 
 		# else
-		return _reverse qw(date date-received from mailbox-order score size spam subject threads to);
+		return _reverse(qw(date date-received from mailbox-order score size spam subject threads to));
 	}
 
 	# Unknown
@@ -88,7 +88,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2009 by Luke Ross
+Copyright (C) 2005-2010 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

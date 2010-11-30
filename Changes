@@ -1,4 +1,10 @@
-Revision history for Perl script muttrcbuilder.
+This file documents the revision history for Perl extension Mutt::Config::Builder.
+
+0.3   Sun Nov 28 22:18:55
+	- reimplemented in Catalyst
+	- fixed a parse error in the _reverse calls
+	- added a version() method to Mutt::Config objects
+	- updated mutt version included
 
 0.2   Sat Aug  1 17:09:30 2009
 	- replace the CGI with Mason templates

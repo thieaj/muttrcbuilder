@@ -1,17 +1,8 @@
-<%once>
-    use Mutt::Config;
-</%once>
 <%args>
-    $version # Version of muttrc we're building
-    $args    # %ARGS from dispatch.html
+    $mutt # Mutt::Config for this version of Mutt
 </%args>
-<%init>
-    die("Invalid version") if ($version =~ m/[^0-9A-Za-z_.-]/);
-    die("Invalid args")    unless ref $args;
-    my $config = Mutt::Config->new($version);
-</%init>
-<&| components.html:page &>
-<form method="post" action="muttrc.html">
+<&| layout.mas &>
+<form method="post" action="<% $c->uri_for("/build") %>">
   <p>How would you like your <tt>muttrc</tt> formatted?</p>
   <p>
     <label>
@@ -39,7 +30,5 @@
   <p>
     <input type="submit" value="Build my muttrc" />
   </p>
-<& components.html:copy_over_hidden_fields, args => $args,
-  mutt => $config, page => "" &>
 </form>
 </&>
