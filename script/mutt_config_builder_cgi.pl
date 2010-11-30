@@ -1,13 +1,20 @@
 #!/usr/bin/env perl
 
-use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Mutt::Config::Builder', 'CGI');
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Mutt::Config::Builder;
+
+Mutt::Config::Builder->run;
 
 1;
 
 =head1 NAME
 
-mutt_config_builder_cgi.pl - Catalyst CGI
+mutt_config_builder_cgi.pl - CGI for the Muttrc Builder
 
 =head1 SYNOPSIS
 
@@ -15,7 +22,7 @@ See L<Catalyst::Manual>
 
 =head1 DESCRIPTION
 
-Run a Catalyst application as a cgi script.
+Run the Muttrc Builder application as a cgi script.
 
 =head1 AUTHORS
 
@@ -27,4 +34,3 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
