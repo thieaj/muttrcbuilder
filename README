@@ -1,4 +1,4 @@
-muttrcbuilder version 0.02
+muttrcbuilder version 0.03
 ==========================
 
 This is the code used to run http://www.muttrcbuilder.org/. It provides
@@ -25,7 +25,7 @@ To install this module type the following:
 
 DEPENDENCIES
 
-These programs require perl v5.6.0 or greater.
+These programs require perl v5.8.0 or greater.
 
 The builder requires Catalyst, Catalyst::Action::RenderView,
 Catalyst::Plugin::ConfigLoader, Catalyst::Plugin::Session,
