@@ -177,7 +177,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 LICENSE
 
-Copyright (C) 2005-2010 by Luke Ross
+Copyright (C) 2005-2014 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

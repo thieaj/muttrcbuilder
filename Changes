@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mutt::Config::Builder.
 
-0.3   Sun Nov 28 22:18:55
+0.4   Wed 29 Oct 17:47:56 2014
+    - Fix typos
+    - New mutt release
+
+0.3   Sun Nov 28 22:18:55 2010
 	- reimplemented in Catalyst
 	- fixed a parse error in the _reverse calls
 	- added a version() method to Mutt::Config objects
@@ -15,4 +19,3 @@ This file documents the revision history for Perl extension Mutt::Config::Builde
 
 0.1   Sat Apr  7 19:39:35 2007
 	- packaged for download from website source
-

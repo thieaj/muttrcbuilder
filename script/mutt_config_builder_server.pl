@@ -17,9 +17,9 @@ my $debug             = 0;
 my $fork              = 0;
 my $help              = 0;
 my $host              = undef;
-my $port              = $ENV{LEMON_PORT} || $ENV{CATALYST_PORT} || 3000;
+my $port              = $ENV{MUTTRC_PORT} || $ENV{CATALYST_PORT} || 3000;
 my $keepalive         = 0;
-my $restart           = $ENV{LEMON_RELOAD} || $ENV{CATALYST_RELOAD} || 0;
+my $restart           = $ENV{MUTTRC_RELOAD} || $ENV{CATALYST_RELOAD} || 0;
 my $background        = 0;
 my $pidfile           = undef;
 

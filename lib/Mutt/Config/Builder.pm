@@ -17,7 +17,7 @@ use Catalyst qw/-Debug
                 Static::Simple
                 Unicode::Encoding/; # You can use "Unicode" here if
                                     # you don't have Unicode::Encoding
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 # Configure the application.
 #
@@ -62,7 +62,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2010 by Luke Ross
+Copyright (C) 2005-2014 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -64,6 +64,8 @@ while(<$lh>) {
 
 close($lh) or die("Error closing lynx: $!");
 
+print $op "#  END\n";
+
 sub generate_output_name {
 	my $module = shift;
 	my $fn = $INC{"Mutt/Config.pm"};
