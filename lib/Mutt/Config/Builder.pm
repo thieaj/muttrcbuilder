@@ -17,7 +17,7 @@ use Catalyst qw/-Debug
                 Static::Simple
                 Unicode::Encoding/; # You can use "Unicode" here if
                                     # you don't have Unicode::Encoding
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 # Configure the application.
 #

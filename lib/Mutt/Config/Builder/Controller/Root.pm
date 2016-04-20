@@ -92,8 +92,8 @@ sub setup_mutt :Private {
 
 	# Stop if no valid version
 	if (not $version) {
-		$c->res->redirect($c->uri_for("/"))
-		$c->detach()
+		$c->res->redirect($c->uri_for("/"));
+		$c->detach();
 	}
 	$c->detach("error", ["Invalid version"]) if ($version =~ m/[^0-9A-Za-z_.-]/);
 	$c->stash->{mutt} = Mutt::Config->new($version);
