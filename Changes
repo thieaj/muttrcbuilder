@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mutt::Config::Builder.
 
-0.5
+0.5   Wed 20 Apr 22:53:00 2016
 	- Add mutt-1.6.0
 
 0.4   Wed 29 Oct 17:47:56 2014
