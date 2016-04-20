@@ -89,8 +89,12 @@ sub setup_mutt :Private {
 		# Is it in the session
 		$version = $c->session->{version};
 	}
-    
+
 	# Stop if no valid version
+	if (not $version) {
+		$c->res->redirect($c->uri_for("/"))
+		$c->detach()
+	}
 	$c->detach("error", ["Invalid version"]) if ($version =~ m/[^0-9A-Za-z_.-]/);
 	$c->stash->{mutt} = Mutt::Config->new($version);
 }
@@ -177,7 +181,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 LICENSE
 
-Copyright (C) 2005-2014 by Luke Ross
+Copyright (C) 2005-2016 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -14,7 +14,7 @@ Mutt::Config::Builder::View::Mason - Mason View Component for Mutt::Config::Buil
 =head1 DESCRIPTION
 
 Mason View Component for Mutt::Config::Builder. This is used to render
-the templayes that display the site.
+the templates that display the site.
 
 =head1 SEE ALSO
 
@@ -26,7 +26,7 @@ Luke Ross, E<lt>lr@lukeross.nameE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2014 by Luke Ross
+Copyright (C) 2005-2016 by Luke Ross
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
