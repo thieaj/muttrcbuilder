@@ -2610,7 +2610,7 @@ to scan all cur messages.
 },
 
 'mark_macro_prefix' => {
-'default' => ''',
+'default' => "'",
 'type' => 'string',
 'text' => '
 
