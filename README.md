@@ -1,4 +1,4 @@
-= muttrcbuilder version 3.0
+= muttrcbuilder version 2.0
 
 This is the code used to run <http://www.muttrcbuilder.org/>. It provides an
 easy way to create `muttrc` files for the mutt email client
