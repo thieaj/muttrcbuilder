@@ -1,9 +1,0 @@
-<%args>
-$mutt # Mutt::Config object we're building for
-</%args>
-# Colors
-
-% foreach my $k (sort keys %{ $c->session() }) {
-%   next unless $k =~ m/^col_fg_([a-z0-9_-]+)/;
-color <% sprintf("%-10s %-12s %s", $1, $c->session->{"col_fg_$1"}, $c->session->{"col_bg_$1"}) %>
-% }

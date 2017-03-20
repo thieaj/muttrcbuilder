@@ -1,56 +1,19 @@
-muttrcbuilder version 1.0
-=========================
+= muttrcbuilder version 3.0
 
 This is the code used to run <http://www.muttrcbuilder.org/>. It provides an
 easy way to create `muttrc` files for the mutt email client
 (<http://www.mutt.org/>).
 
-Run `script/mutt_config_builder_server.pl` to test the application.
+== Installation
 
-The builder uses a series of modules under `Mutt::Config` to load information
-on configuration variables supported by different versions of mutt - actual
-information is under `Mutt::Config::Version`.
+To build run `make` then view the `html/index.html` file in your web browser.
 
-There is a program to take a mutt `manual.xml` and `manual.txt` and turn it
-into a `Mutt::Config::Version` module, in
-`script/mutt_config_write_module.pl`.
+== Dependencies
 
-INSTALLATION
-------------
+Requires `nodejs` and `npm`. The `Makefile` assumed a Unix-style environment
+with tools such as `touch` in the path.
 
-To install this module type the following:
-
-    perl Makefile.PL
-    make
-    make install
-    cp script/mutt_config_builder_cgi.pl /var/www/cgi-bin/
-
-DEPENDENCIES
-------------
-
-These programs require perl v5.8.0 or greater.
-
-The builder requires:
-
-* `Catalyst
-* `Catalyst::Action::RenderView`
-* `Catalyst::Devel`
-* `Catalyst::Plugin::ConfigLoader`
-* `Catalyst::Plugin::Session`
-* `Catalyst::Plugin::Session::State::Cookie`
-* `Catalyst::Plugin::Session::Store::FastMmap`
-* `Catalyst::Plugin::Unicode::Encoding`
-* `Catalyst::View::Mason`
-* `Module::Pluggable`
-
-The `mutt_config_write_module` script requires:
-
-* `XML::LibXML`
-* `XML::LibXSLT`
-* The `lynx` web browser in your path
-
-COPYRIGHT AND LICENCE
----------------------
+== Copyright and licence
 
 Copyright (C) 2005-2017 by Luke Ross
 
