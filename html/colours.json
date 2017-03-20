@@ -1,0 +1,68 @@
+{
+   "colours" : [
+      {
+         "name" : "white",
+         "css" : "grey"
+      },
+      {
+         "css" : "black",
+         "name" : "black"
+      },
+      {
+         "css" : "#800080",
+         "name" : "magenta"
+      },
+      {
+         "css" : "#000080",
+         "name" : "blue"
+      },
+      {
+         "css" : "#008080",
+         "name" : "cyan"
+      },
+      {
+         "name" : "yellow",
+         "css" : "brown"
+      },
+      {
+         "css" : "#800000",
+         "name" : "red"
+      },
+      {
+         "css" : "",
+         "name" : "default"
+      },
+      {
+         "name" : "brightwhite",
+         "css" : "white"
+      },
+      {
+         "name" : "brightblack",
+         "css" : "#404040"
+      },
+      {
+         "name" : "brightgreen",
+         "css" : "#00ff00"
+      },
+      {
+         "css" : "#ff00ff",
+         "name" : "brightmagenta"
+      },
+      {
+         "css" : "blue",
+         "name" : "brightblue"
+      },
+      {
+         "css" : "cyan",
+         "name" : "brightcyan"
+      },
+      {
+         "name" : "brightyellow",
+         "css" : "yellow"
+      },
+      {
+         "css" : "red",
+         "name" : "brightred"
+      }
+   ]
+}

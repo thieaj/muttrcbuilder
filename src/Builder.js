@@ -10,6 +10,10 @@ class Router extends Backbone.Router.extend({
     routes: {
         "options/:version/:name": "optionPage",
         "colours/:version": "colourPage",
+        "build/:version": "chooseBuildPage",
+        "build/:version/minimal": "buildMinimal",
+        "build/:version/all": "buildAllOptions",
+        "build/:version/manual": "buildManual"
         "*path": "chooseVersion"
     }
 }) {

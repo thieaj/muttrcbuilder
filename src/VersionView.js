@@ -5,8 +5,6 @@ Backbone.$ = $
 
 class VersionView extends Backbone.View.extend({
 	template: _.template(`
-<h1>muttrc builder</h1>
-
 <p>
     This site lets you create a <tt>muttrc</tt> configuration file for
     the <a href="http://www.mutt.org/">Mutt email program</a>. You
