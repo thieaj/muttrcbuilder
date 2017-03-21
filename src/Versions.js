@@ -10,7 +10,8 @@ class Attribute extends Backbone.Model {
             id: "unknown",
             default: "unknown",
             type: "unknown",
-            text: "unknown"
+            text: "unknown",
+            category: "unknown"
         };
     }
 
@@ -47,27 +48,29 @@ class Version extends Backbone.Model {
         return {
             id: "unknown",
             text: "unknown",
-            attributes: new AttributeCollection()
+            attrs: null
         };
     }
 
     url() {
-        return "config-v" + this.get("id") + ".json";
+        return "config-" + this.get("id") + ".json";
     }
 
     parse(resp, options) {
-	let attrs = resp.attributes.map(e => new Attribute(e));
-        resp.attributes = new AttributeCollection();
-	resp.attributes.add(attrs);
-	return resp;
+    let attrs = resp.attrs.map(e => {
+            e.category = Categories.get(e.id)
+            e.category = e.category ? e.category.get("page") : "default";
+            return new Attribute(e)
+        });
+        resp.attrs = new AttributeCollection();
+    resp.attrs.add(attrs);
+    return resp;
     }
 
     pages() {
         let ps = {}
-        for(let attr of this.get("attributes").models) {
-           let cat = Categories.get(attr.id);
-           let page = cat ? cat.get("page") : null
-           ps[page || "default"] = 1;
+        for(let attr of this.get("attrs").models) {
+           ps[attr.get("category")] = 1;
         }
         ps = Object.keys(ps);
         ps.sort();

@@ -45,7 +45,6 @@ class VersionView extends Backbone.View.extend({
 
 	displayOptionPage() {
             let vid = $("#version").val();
-            console.log($("#version"));
             Backbone.history.navigate(`options/${vid}/essential`, {trigger: true});
             this.close();
 	}

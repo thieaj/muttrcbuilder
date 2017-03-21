@@ -1,6 +1,7 @@
 let Backbone = require("backbone");
 Backbone.$ = require("jquery");
 
+import Colours from "./Colours";
 import Categories from "./Categories";
 import OptionPageView from "./OptionPageView";
 import Versions from "./Versions";
@@ -35,12 +36,13 @@ class Router extends Backbone.Router.extend({
 
     optionPage(version, name) {
         let model = Versions.get(version);
-        let v = new OptionPageView({model});
-	console.log(model.attributes.models);
         Promise.all([
             Categories.fetch(),
-            model.fetch()
+            Colours.fetch(),
         ]).then(jq => {
+            return model.fetch()
+        }).then(jq => {
+            let v = new OptionPageView({model});
             v.render(name);
             Backbone.$("body").html(v.el);
 	});

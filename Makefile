@@ -25,4 +25,4 @@ realclean: clean
 	$(RM) -r node_modules || true
 
 run: all
-	(cd src; python -m SimpleHTTPServer 5000)
+	(cd html; python -m SimpleHTTPServer 5000)

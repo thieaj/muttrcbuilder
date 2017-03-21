@@ -6,7 +6,7 @@ class AttributeCategory extends Backbone.Model {
     defaults() {
         return {
             id: "unknown",
-            page: ""
+            page: "default"
         };
     }
 }

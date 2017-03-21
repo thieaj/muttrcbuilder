@@ -9,7 +9,7 @@ class OptionPageView extends Backbone.View.extend({
 <form>
 <p>
     <strong>Change page:</strong>
-    <select name="page">
+    <select name="page" id="page">
         <% for (let _page of version.pages()) { %>
 	     <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
 	<% } %>
@@ -37,10 +37,17 @@ class OptionPageView extends Backbone.View.extend({
         `),
 
 	events: {
+		"click #changePage": "displayOptionPage"
 	}
 }) {
+	displayOptionPage() {
+            let pg = $("#page").val();
+            Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
+            this.close();
+	}
+
 	render(page) {
-		this.$el.html(this.template({version: this.model, page: page, options: this.model.get("attributes").models}));
+		this.$el.html(this.template({version: this.model, page: page, options: this.model.get("attrs").where({"category": page})}));
 		return this.$el;
 	}
 
