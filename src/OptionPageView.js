@@ -29,17 +29,27 @@ class OptionPageView extends Backbone.View.extend({
         <p>
         <div class="htmldesc"><%= option.get("text") %></div>
         <% if (option.possibleValues()) { %>
-        <%= option.possibleValues() %>
+        <select class="option" name="<%= option.get("id") %>">
+        <% for(let v of option.possibleValues()) { %>
+            <option value="<%= v %>"<% if (v == option.currentValue()) { %> selected="selected"<% } %>><%= v %></option>
+        <% } %>
+        </select>
         <% } else { %>
-        <input class="option" name="opt_<%= option.get("id") %>" id="opt_<%= option.get("id") %>" value="<%= option.get("default") %>" />
+        <input class="option" name="<%= option.get("id") %>" value="<%= option.currentValue() %>" />
         <% } %>
     <% } %>
         `),
 
 	events: {
-		"click #changePage": "displayOptionPage"
+		"click #changePage": "displayOptionPage",
+                "change .option": "updateAttr"
 	}
 }) {
+        updateAttr(e) {
+            let formElement = $(e.target);
+            this.model.get("attrs").get(formElement.attr("name")).set("value", formElement.val());
+        }
+
 	displayOptionPage() {
             let pg = $("#page").val();
             Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});

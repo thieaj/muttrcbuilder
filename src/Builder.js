@@ -37,10 +37,10 @@ class Router extends Backbone.Router.extend({
     optionPage(version, name) {
         let model = Versions.get(version);
         Promise.all([
-            Categories.fetch(),
-            Colours.fetch(),
+            Categories.ensureFetched(),
+            Colours.ensureFetched(),
         ]).then(jq => {
-            return model.fetch()
+            return model.ensureFetched()
         }).then(jq => {
             let v = new OptionPageView({model});
             v.render(name);

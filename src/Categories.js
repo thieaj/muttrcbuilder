@@ -22,6 +22,10 @@ class CategoryCollection extends Backbone.Collection.extend({
         }
         return res;
     }
+
+    ensureFetched() {
+        if (this.models.length == 0) { return this.fetch(); }
+    }
 }
 
 export default new CategoryCollection();

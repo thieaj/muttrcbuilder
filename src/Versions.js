@@ -11,7 +11,8 @@ class Attribute extends Backbone.Model {
             default: "unknown",
             type: "unknown",
             text: "unknown",
-            category: "unknown"
+            category: "unknown",
+            value: null
         };
     }
 
@@ -36,6 +37,10 @@ class Attribute extends Backbone.Model {
         } else {
             return null;
         }
+    }
+
+    currentValue() {
+        return (this.get("value") == null) ? this.get("default") : this.get("value");
     }
 }
 
@@ -75,6 +80,10 @@ class Version extends Backbone.Model {
         ps = Object.keys(ps);
         ps.sort();
         return ps;
+    }
+
+    ensureFetched() {
+        if (!this.get("attrs")) { return this.fetch(); }
     }
 }
 
