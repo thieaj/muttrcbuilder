@@ -13,6 +13,29 @@ class Attribute extends Backbone.Model {
             text: "unknown"
         };
     }
+
+    possibleValues() {
+        let _reverse = (v) => {[].concat(...v.map((v2) => [v2, "reverse-" + v2]))};
+        let t = this.get("type");
+        if (t == "boolean") {
+            return ["yes", "no"];
+        } else if (t == "quadoption") {
+            return ["yes", "ask-yes", "ask-no", "no"];
+        } else if (t == "folder magic") {
+            return ["mbox", "MMDF", "MH", "Maildir"];
+        } else if (t == "sort order") {
+            let n = this.get("name");
+            if (n == "sort_alias") {
+                return ["address", "alias", "unsorted"];
+            } else if (n == "sort_browser") {
+                return _reverse(["alpha", "data", "size", "unsorted"]);
+            } else {
+                return _reverse(["date", "date-received", "from", "mailbox-order", "score", "size", "spam", "subject", "threads", "to"]);
+            }
+        } else {
+            return null;
+        }
+    }
 }
 
 class AttributeCollection extends Backbone.Collection.extend({

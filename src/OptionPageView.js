@@ -28,7 +28,11 @@ class OptionPageView extends Backbone.View.extend({
             <strong>Default:</strong> <%= option.get("default") %>
         <p>
         <div class="htmldesc"><%= option.get("text") %></div>
+        <% if (option.possibleValues()) { %>
+        <%= option.possibleValues() %>
+        <% } else { %>
         <input class="option" name="opt_<%= option.get("id") %>" id="opt_<%= option.get("id") %>" value="<%= option.get("default") %>" />
+        <% } %>
     <% } %>
         `),
 

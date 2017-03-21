@@ -13,7 +13,7 @@ class Router extends Backbone.Router.extend({
         "build/:version": "chooseBuildPage",
         "build/:version/minimal": "buildMinimal",
         "build/:version/all": "buildAllOptions",
-        "build/:version/manual": "buildManual"
+        "build/:version/manual": "buildManual",
         "*path": "chooseVersion"
     }
 }) {
