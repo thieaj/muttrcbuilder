@@ -1,10 +1,10 @@
 let _ = require("underscore");
-let $ = require("jquery")
+let $ = require("jquery");
 let Backbone = require("backbone");
-Backbone.$ = $
+Backbone.$ = $;
 
 class VersionView extends Backbone.View.extend({
-	template: _.template(`
+    template: _.template(`
 <p>
     This site lets you create a <tt>muttrc</tt> configuration file for
     the <a href="http://www.mutt.org/">Mutt email program</a>. You
@@ -34,25 +34,25 @@ class VersionView extends Backbone.View.extend({
 </form>
         `),
 
-	events: {
-		"click #chooseVersion": "displayOptionPage"
-	}
+    events: {
+        "click #chooseVersion": "displayOptionPage"
+    }
 }) {
-	render() {
-		this.$el.html(this.template({versions: this.model}));
-		return this.$el;
-	}
+    render() {
+        this.$el.html(this.template({versions: this.model}));
+        return this.$el;
+    }
 
-	displayOptionPage() {
-            let vid = $("#version").val();
-            Backbone.history.navigate(`options/${vid}/essential`, {trigger: true});
-            this.close();
-	}
+    displayOptionPage() {
+        let vid = $("#version").val();
+        Backbone.history.navigate(`options/${vid}/essential`, {trigger: true});
+        this.close();
+    }
 
-	close() {
-		this.remove();
-		this.unbind();
-	}
+    close() {
+        this.remove();
+        this.unbind();
+    }
 }
 
 export default VersionView;

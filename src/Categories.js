@@ -1,4 +1,3 @@
-let _ = require("underscore");
 let Backbone = require("backbone");
 Backbone.$ = require("jquery");
 
@@ -21,10 +20,6 @@ class CategoryCollection extends Backbone.Collection.extend({
             res.push({id: k, page: resp[k]});
         }
         return res;
-    }
-
-    ensureFetched() {
-        if (this.models.length == 0) { return this.fetch(); }
     }
 }
 

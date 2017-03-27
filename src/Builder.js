@@ -3,6 +3,7 @@ Backbone.$ = require("jquery");
 
 import Colours from "./Colours";
 import Categories from "./Categories";
+import ChooseFormatView from "./ChooseFormatView";
 import OptionPageView from "./OptionPageView";
 import Versions from "./Versions";
 import VersionView from "./VersionView";
@@ -14,7 +15,8 @@ class Router extends Backbone.Router.extend({
         "build/:version": "chooseBuildPage",
         "build/:version/minimal": "buildMinimal",
         "build/:version/all": "buildAllOptions",
-        "build/:version/manual": "buildManual",
+        "build/:version/categories": "buildCategories",
+        "build/:version/full": "buildManual",
         "*path": "chooseVersion"
     }
 }) {
@@ -28,28 +30,41 @@ class Router extends Backbone.Router.extend({
         Versions.add(new Version({id}));
     }
 
-    chooseVersion(id) {
+    chooseVersion() {
         let v = new VersionView({model: Versions.models});
         v.render();
-        Backbone.$("body").html(v.el);
+        Backbone.$("#main").html(v.el);
     }
 
     optionPage(version, name) {
         let model = Versions.get(version);
-        Promise.all([
-            Categories.ensureFetched(),
-            Colours.ensureFetched(),
-        ]).then(jq => {
-            return model.ensureFetched()
-        }).then(jq => {
+        let doRender = () => {
             let v = new OptionPageView({model});
             v.render(name);
-            Backbone.$("body").html(v.el);
-	});
+            Backbone.$("#main").html(v.el);
+        };
+        if (!model.needsLoading()) {
+            return doRender();
+        }
+        Promise.all([
+            Categories.fetch(),
+            Colours.fetch(),
+        ]).then(jq => {
+            return model.fetch();
+        }).then(jq => {
+            doRender();
+        });
     }
 
     start() {
         Backbone.history.start();
+    }
+
+    chooseBuildPage(version) {
+        let model = Versions.get(version);
+        let v = new ChooseFormatView({model});
+        v.render(name);
+        Backbone.$("#main").html(v.el);
     }
 }
 

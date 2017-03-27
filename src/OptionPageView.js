@@ -1,18 +1,18 @@
 let _ = require("underscore");
-let $ = require("jquery")
+let $ = require("jquery");
 let Backbone = require("backbone");
-Backbone.$ = $
+Backbone.$ = $;
 
 class OptionPageView extends Backbone.View.extend({
-	template: _.template(`
+    template: _.template(`
 <hr />
 <form>
 <p>
     <strong>Change page:</strong>
     <select name="page" id="page">
         <% for (let _page of version.pages()) { %>
-	     <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
-	<% } %>
+         <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
+    <% } %>
          <option value="_color" >color</option>
          <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
     </select>
@@ -40,31 +40,31 @@ class OptionPageView extends Backbone.View.extend({
     <% } %>
         `),
 
-	events: {
-		"click #changePage": "displayOptionPage",
-                "change .option": "updateAttr"
-	}
+    events: {
+        "click #changePage": "displayOptionPage",
+        "change .option": "updateAttr"
+    }
 }) {
-        updateAttr(e) {
-            let formElement = $(e.target);
-            this.model.get("attrs").get(formElement.attr("name")).set("value", formElement.val());
-        }
+    updateAttr(e) {
+        let formElement = $(e.target);
+        this.model.get("attrs").get(formElement.attr("name")).set("value", formElement.val());
+    }
 
-	displayOptionPage() {
-            let pg = $("#page").val();
-            Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
-            this.close();
-	}
+    displayOptionPage() {
+        let pg = $("#page").val();
+        Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
+        this.close();
+    }
 
-	render(page) {
-		this.$el.html(this.template({version: this.model, page: page, options: this.model.get("attrs").where({"category": page})}));
-		return this.$el;
-	}
+    render(page) {
+        this.$el.html(this.template({version: this.model, page: page, options: this.model.get("attrs").where({"category": page})}));
+        return this.$el;
+    }
 
-	close() {
-		this.remove();
-		this.unbind();
-	}
+    close() {
+        this.remove();
+        this.unbind();
+    }
 }
 
 export default OptionPageView;

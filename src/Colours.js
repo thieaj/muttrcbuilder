@@ -18,10 +18,6 @@ class ColourCollection extends Backbone.Collection.extend({
     parse(resp, options) {
         return resp["colours"];
     }
-
-    ensureFetched() {
-        if (this.models.length == 0) { return this.fetch(); }
-    }
 }
 
 export default new ColourCollection();

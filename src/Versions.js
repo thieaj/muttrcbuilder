@@ -1,4 +1,3 @@
-let _ = require("underscore");
 let Backbone = require("backbone");
 Backbone.$ = require("jquery");
 
@@ -17,7 +16,7 @@ class Attribute extends Backbone.Model {
     }
 
     possibleValues() {
-        let _reverse = (v) => {[].concat(...v.map((v2) => [v2, "reverse-" + v2]))};
+        let _reverse = (v) => {[].concat(...v.map((v2) => [v2, "reverse-" + v2]));};
         let t = this.get("type");
         if (t == "boolean") {
             return ["yes", "no"];
@@ -62,28 +61,28 @@ class Version extends Backbone.Model {
     }
 
     parse(resp, options) {
-    let attrs = resp.attrs.map(e => {
-            e.category = Categories.get(e.id)
+        let attrs = resp.attrs.map(e => {
+            e.category = Categories.get(e.id);
             e.category = e.category ? e.category.get("page") : "default";
-            return new Attribute(e)
+            return new Attribute(e);
         });
         resp.attrs = new AttributeCollection();
-    resp.attrs.add(attrs);
-    return resp;
+        resp.attrs.add(attrs);
+        return resp;
     }
 
     pages() {
-        let ps = {}
+        let ps = {};
         for(let attr of this.get("attrs").models) {
-           ps[attr.get("category")] = 1;
+            ps[attr.get("category")] = 1;
         }
         ps = Object.keys(ps);
         ps.sort();
         return ps;
     }
 
-    ensureFetched() {
-        if (!this.get("attrs")) { return this.fetch(); }
+    needsLoading() {
+        return !this.get("attrs");
     }
 }
 
@@ -91,4 +90,4 @@ class VersionCollection extends Backbone.Collection.extend({
     model: Version
 }) {}
 
-export default new VersionCollection()
+export default new VersionCollection();
