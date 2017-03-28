@@ -52,7 +52,11 @@ class OptionPageView extends Backbone.View.extend({
 
     displayOptionPage() {
         let pg = $("#page").val();
-        Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
+        if (pg == "_finish") {
+            Backbone.history.navigate(`build/${this.model.get("id")}`, {trigger: true});
+        } else {
+            Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
+        }
         this.close();
     }
 

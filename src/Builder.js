@@ -36,35 +36,42 @@ class Router extends Backbone.Router.extend({
         Backbone.$("#main").html(v.el);
     }
 
-    optionPage(version, name) {
+    getVersion(version) {
         let model = Versions.get(version);
-        let doRender = () => {
+        let p = new Promise((resolve, reject) => {
+            if (!model.needsLoading()) {
+                resolve(model);
+            }
+            Promise.all([
+                Categories.fetch(),
+                Colours.fetch(),
+            ]).then(jq => {
+                return model.fetch();
+            }).then(jq => {
+                resolve(model);
+            });
+        });
+        return p;
+    }
+
+    optionPage(version, name) {
+        this.getVersion(version).then(model => {
             let v = new OptionPageView({model});
             v.render(name);
             Backbone.$("#main").html(v.el);
-        };
-        if (!model.needsLoading()) {
-            return doRender();
-        }
-        Promise.all([
-            Categories.fetch(),
-            Colours.fetch(),
-        ]).then(jq => {
-            return model.fetch();
-        }).then(jq => {
-            doRender();
+        });
+    }
+
+    chooseBuildPage(version) {
+        this.getVersion(version).then(model => {
+            let v = new ChooseFormatView({model});
+            v.render(name);
+            Backbone.$("#main").html(v.el);
         });
     }
 
     start() {
         Backbone.history.start();
-    }
-
-    chooseBuildPage(version) {
-        let model = Versions.get(version);
-        let v = new ChooseFormatView({model});
-        v.render(name);
-        Backbone.$("#main").html(v.el);
     }
 }
 
