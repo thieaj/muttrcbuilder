@@ -13,7 +13,6 @@ class Router extends Backbone.Router.extend({
         "options/:version/:name": "optionPage",
         "colours/:version": "colourPage",
         "build/:version": "chooseBuildPage",
-        "build/:version/all": "buildAllOptions",
         "build/:version/categories": "buildCategories",
         "build/:version/full": "buildManual",
         "*path": "chooseVersion"
@@ -40,6 +39,7 @@ class Router extends Backbone.Router.extend({
         let p = new Promise((resolve, reject) => {
             if (!model.needsLoading()) {
                 resolve(model);
+                return;
             }
             Promise.all([
                 Categories.fetch(),

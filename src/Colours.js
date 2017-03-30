@@ -1,4 +1,3 @@
-let _ = require("underscore");
 let Backbone = require("backbone");
 Backbone.$ = require("jquery");
 

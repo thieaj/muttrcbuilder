@@ -31,6 +31,13 @@ class VersionView extends Backbone.View.extend({
          </select>
          <button id="chooseVersion" type="button">Next</button>
     </p>
+
+    <hr />
+
+    <p>
+         This service is provided in the hope that you'll find it useful,
+         but no warranty is offered.
+    </p>
 </form>
         `),
 
