@@ -47,15 +47,11 @@ class ChooseFormatView extends Backbone.View.extend({
     }
 
     formatSelected() {
-        let format = $("input[name='format']:checked").val();
-        if (format == "minimal") {
-            this.saveBasicFormat();
-            return;
-        }
-        else if (format == "all") {
-            this.saveFullFormat();
-            return;
-        }
+        let handler = {
+            minimal: this.saveBasicFormat,
+            all: this.saveFullFormat
+        }[$("input[name='format']:checked").val()];
+        handler();
     }
 
     close() {
@@ -74,8 +70,9 @@ class ChooseFormatView extends Backbone.View.extend({
     saveBasicFormat() {
         let lines = this.getFileHeader();
         for (let attr of this.model.get("attrs").models) {
-            if (attr.get("default") != attr.currentValue()) {
-                lines.push("set " + attr.get("id") + " = " + attr.currentValue() + "\n");
+            let line = writeAttr(attr, false);
+            if (line) {
+                lines.push(line);
             }
         }
         this.writeFile(lines);
@@ -84,9 +81,7 @@ class ChooseFormatView extends Backbone.View.extend({
     saveFullFormat() {
         let lines = this.getFileHeader();
         for (let attr of this.model.get("attrs").models) {
-            let line = (attr.get("default") == attr.currentValue()) ? "# " : "";
-            line += "set " + attr.get("id") + " = " + attr.currentValue() + "\n";
-            lines.push(line);
+            lines.push(writeAttr(attr, true));
         }
         this.writeFile(lines);
     }
@@ -94,6 +89,19 @@ class ChooseFormatView extends Backbone.View.extend({
     writeFile(lines) {
         let blob = new Blob(lines, {type: "text/plain;charset=iso-8859-1"});
         FileSaver.saveAs(blob, "muttrc");
+    }
+
+    writeAttr(attr, always) {
+        let quote = _.contains(["boolean", "quadoption"], attr.get(type)) ? "" : "'";
+        let line = "set " + attr.get("id") + " = " + quote + attr.currentValue() + quote + "\n";
+        if (attr.get("default") == attr.currentValue()) {
+            if (always) {
+               line = "# " + line;
+            } else {
+               return null;
+            }
+        }
+        return line;
     }
 }
 
