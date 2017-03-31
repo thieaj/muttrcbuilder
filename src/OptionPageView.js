@@ -13,7 +13,7 @@ class OptionPageView extends Backbone.View.extend({
         <% for (let _page of version.pages()) { %>
          <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
     <% } %>
-         <option value="_color" >color</option>
+         <option value="_colour" >color</option>
          <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
     </select>
     <button type="button" id="changePage">Change</button>
@@ -54,6 +54,8 @@ class OptionPageView extends Backbone.View.extend({
         let pg = $("#page").val();
         if (pg == "_finish") {
             Backbone.history.navigate(`build/${this.model.get("id")}`, {trigger: true});
+        } else if (pg == "_colour") {
+            Backbone.history.navigate(`colours/${this.model.get("id")}`, {trigger: true});
         } else {
             Backbone.history.navigate(`options/${this.model.get("id")}/${pg}`, {trigger: true});
         }

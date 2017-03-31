@@ -1,9 +1,10 @@
 let Backbone = require("backbone");
 Backbone.$ = require("jquery");
 
-import Colours from "./Colours";
 import Categories from "./Categories";
 import ChooseFormatView from "./ChooseFormatView";
+import ColourPageView from "./ColourPageView";
+import Colours from "./Colours";
 import OptionPageView from "./OptionPageView";
 import Versions from "./Versions";
 import VersionView from "./VersionView";
@@ -41,10 +42,7 @@ class Router extends Backbone.Router.extend({
                 resolve(model);
                 return;
             }
-            Promise.all([
-                Categories.fetch(),
-                Colours.fetch(),
-            ]).then(jq => {
+            Categories.fetch().then(jq => {
                 return model.fetch();
             }).then(jq => {
                 resolve(model);
@@ -56,6 +54,14 @@ class Router extends Backbone.Router.extend({
     optionPage(version, name) {
         this.getVersion(version).then(model => {
             let v = new OptionPageView({model});
+            v.render(name);
+            Backbone.$("#main").html(v.el);
+        });
+    }
+
+    colourPage(version, name) {
+        this.getVersion(version).then(model => {
+            let v = new ColourPageView({model});
             v.render(name);
             Backbone.$("#main").html(v.el);
         });
