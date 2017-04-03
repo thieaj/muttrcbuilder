@@ -34,8 +34,8 @@ class ColourPageView extends Backbone.View.extend({
 <span class="status">-*-Mutt: imap://euphrates/INBOX [Msgs:29]---(threads/date)--------------(end)---</span>
 <span class="hdrdefault">
 Date: Thu, 28 Jul 2005 16:26:37 +0100                                           
-From: A friend &lt;friend@example.com&gt;                                                                 
-To: Me &lt;me@example.org&gt;                                                                         
+From: A friend &lt;friend@example.com&gt;                                             
+To: Me &lt;me@example.org&gt;                                                         
 Subject: New email                                                              
 User-Agent: Mutt/1.5.9i                                                         
 X-SA-Exim-Scanned: No (on mail.example.com); Mail filter running algorithm was  
@@ -63,10 +63,10 @@ Foo Bar                                  Acme Widgets Ltd                       
 <tr><td><%= sec.get("id") %></td>
 <% for (let col of ["fg", "bg"]) { %>
 <td>
-<select name="col_<%= sec.get("id") %>_<%= col %>" class="colourSelector">
+<select name="<%= sec.get("id") %>_<%= col %>" class="colourSelector">
 <% for (let colour of colours.models) { %>
 <option value="<%= colour.get("id") %>"
-<% if (sec.get(col).get("id") == colour.get("id")) { %>selected="selected"<% } %>
+<% if (sec[col]().get("id") == colour.get("id")) { %>selected="selected"<% } %>
 ><%= colour.get("id") %></option>
 <% } %>
 </section>
@@ -95,14 +95,21 @@ Foo Bar                                  Acme Widgets Ltd                       
         this.close();
     }
 
-    updateColours() {
+    updateColours(e) {
+        let formElement = $(e.target);
+        let eleParts = formElement.attr("name").split("_");
+        ScreenSections.get(eleParts[0]).set(
+            eleParts[1] == "fg" ? "currentForeground" : "currentBackground",
+            Colours.get(formElement.val())
+        );
+        this.updateCSS();
     }
 
     updateCSS() {
         for (let sec of ScreenSections.models) {
             let nodes = this.$el.find("." + sec.get("id"));
-            nodes.css("color", sec.get("fg").get("css"));
-            nodes.css("backgroundColor", sec.get("bg").get("css"));
+            nodes.css("color", sec.fg().get("css"));
+            nodes.css("backgroundColor", sec.bg().get("css"));
         }
     }
 

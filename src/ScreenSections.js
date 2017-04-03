@@ -7,9 +7,23 @@ class ScreenSection extends Backbone.Model {
     defaults() {
         return {
             id: "(unknown)",
-            fg: null,
-            bg: null
+            defaultForeground: null,
+            defaultBackground: null,
+            currentForeground: null,
+            currentBackground: null
         };
+    }
+
+    isSet() {
+        return (currentForeground != null) || (currentBackground != null);
+    }
+
+    fg() {
+        return this.get("currentForeground") || this.get("defaultForeground");
+    }
+
+    bg() {
+        return this.get("currentBackground") || this.get("defaultBackground");
     }
 }
 
@@ -22,19 +36,19 @@ let ssc = new ScreenSectionCollection();
 
 // Taken from a Fedora system, long long ago
 ssc.add([
-   new ScreenSection({id: "attachment", fg: Colours.get("brightmagenta"), bg: Colours.get("default")}),
-   new ScreenSection({id: "error", fg: Colours.get("brightred"), bg: Colours.get("default")}),
-   new ScreenSection({id: "hdrdefault", fg: Colours.get("red"), bg: Colours.get("default")}),
-   new ScreenSection({id: "indicator", fg: Colours.get("brightyellow"), bg: Colours.get("red")}),
-   new ScreenSection({id: "markers", fg: Colours.get("brightcyan"), bg: Colours.get("default")}),
-   new ScreenSection({id: "message", fg: Colours.get("brightcyan"), bg: Colours.get("default")}),
-   new ScreenSection({id: "normal", fg: Colours.get("default"), bg: Colours.get("default")}),
-   new ScreenSection({id: "quoted", fg: Colours.get("brightblue"), bg: Colours.get("default")}),
-   new ScreenSection({id: "search", fg: Colours.get("default"), bg: Colours.get("green")}),
-   new ScreenSection({id: "signature", fg: Colours.get("red"), bg: Colours.get("default")}),
-   new ScreenSection({id: "status", fg: Colours.get("yellow"), bg: Colours.get("blue")}),
-   new ScreenSection({id: "tilde", fg: Colours.get("magenta"), bg: Colours.get("default")}),
-   new ScreenSection({id: "tree", fg: Colours.get("magenta"), bg: Colours.get("default")})
+   new ScreenSection({id: "attachment", defaultForeground: Colours.get("brightmagenta"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "error", defaultForeground: Colours.get("brightred"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "hdrdefault", defaultForeground: Colours.get("red"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "indicator", defaultForeground: Colours.get("brightyellow"), defaultBackground: Colours.get("red")}),
+   new ScreenSection({id: "markers", defaultForeground: Colours.get("brightcyan"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "message", defaultForeground: Colours.get("brightcyan"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "normal", defaultForeground: Colours.get("default"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "quoted", defaultForeground: Colours.get("brightblue"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "search", defaultForeground: Colours.get("default"), defaultBackground: Colours.get("green")}),
+   new ScreenSection({id: "signature", defaultForeground: Colours.get("red"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "status", defaultForeground: Colours.get("yellow"), defaultBackground: Colours.get("blue")}),
+   new ScreenSection({id: "tilde", defaultForeground: Colours.get("magenta"), defaultBackground: Colours.get("default")}),
+   new ScreenSection({id: "tree", defaultForeground: Colours.get("magenta"), defaultBackground: Colours.get("default")})
 ]);
 
 export default ssc;
