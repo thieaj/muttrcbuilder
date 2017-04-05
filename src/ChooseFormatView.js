@@ -48,8 +48,8 @@ class ChooseFormatView extends Backbone.View.extend({
 
     formatSelected() {
         let handler = {
-            minimal: this.saveBasicFormat,
-            all: this.saveFullFormat
+            minimal: () => this.saveBasicFormat(),
+            all: () => this.saveFullFormat()
         }[$("input[name='format']:checked").val()];
         handler();
     }
@@ -70,7 +70,7 @@ class ChooseFormatView extends Backbone.View.extend({
     saveBasicFormat() {
         let lines = this.getFileHeader();
         for (let attr of this.model.get("attrs").models) {
-            let line = writeAttr(attr, false);
+            let line = this.writeAttr(attr, false);
             if (line) {
                 lines.push(line);
             }
@@ -81,7 +81,7 @@ class ChooseFormatView extends Backbone.View.extend({
     saveFullFormat() {
         let lines = this.getFileHeader();
         for (let attr of this.model.get("attrs").models) {
-            lines.push(writeAttr(attr, true));
+            lines.push(this.writeAttr(attr, true));
         }
         this.writeFile(lines);
     }
@@ -92,7 +92,7 @@ class ChooseFormatView extends Backbone.View.extend({
     }
 
     writeAttr(attr, always) {
-        let quote = _.contains(["boolean", "quadoption"], attr.get(type)) ? "" : "'";
+        let quote = _.contains(["boolean", "quadoption"], attr.get("type")) ? "" : "'";
         let line = "set " + attr.get("id") + " = " + quote + attr.currentValue() + quote + "\n";
         if (attr.get("default") == attr.currentValue()) {
             if (always) {
@@ -100,6 +100,8 @@ class ChooseFormatView extends Backbone.View.extend({
             } else {
                return null;
             }
+        } else {
+            line += " # default: " + attr.get("default");
         }
         return line;
     }

@@ -1,5 +1,5 @@
 {
-   "attributes" : [
+   "attrs" : [
       {
          "default" : "-%Z- %C/%m: %-20.20n   %s%*  -- (%P)",
          "id" : "pager_format",

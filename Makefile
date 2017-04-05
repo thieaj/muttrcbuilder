@@ -7,7 +7,7 @@ TOUCH = touch
 # Computed file-sets
 JSFILES = src/*.js
 
-.PHONY: all clean realclean
+.PHONY: all clean deploy realclean run
 
 all: html/muttrcbuilder.js
 
@@ -26,3 +26,6 @@ realclean: clean
 
 run: all
 	(cd html; python -m SimpleHTTPServer 5000)
+
+deploy: all
+	$(NPM) run deploy

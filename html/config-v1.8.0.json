@@ -1,5 +1,5 @@
 {
-   "attributes" : [
+   "attrs" : [
       {
          "default" : "(empty)",
          "id" : "smime_get_cert_email_command",
