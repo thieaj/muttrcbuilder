@@ -38,8 +38,16 @@ class Attribute extends Backbone.Model {
         }
     }
 
+    defaultValue() {
+        let val = this.get("default");
+        if (val === "(empty)") {
+            val = "";
+        }
+        return val;
+    }
+
     currentValue() {
-        return (this.get("value") == null) ? this.get("default") : this.get("value");
+        return (this.get("value") === null) ? this.defaultValue() : this.get("value");
     }
 }
 

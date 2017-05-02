@@ -93,8 +93,8 @@ class ChooseFormatView extends Backbone.View.extend({
 
     writeAttr(attr, always) {
         let quote = _.contains(["boolean", "quadoption"], attr.get("type")) ? "" : "'";
-        let line = "set " + attr.get("id") + " = " + quote + attr.currentValue() + quote + "\n";
-        if (attr.get("default") == attr.currentValue()) {
+        let line = "set " + attr.get("id") + " = " + quote + attr.currentValue() + quote
+        if (attr.defaultValue() === attr.currentValue()) {
             if (always) {
                line = "# " + line;
             } else {
@@ -103,6 +103,7 @@ class ChooseFormatView extends Backbone.View.extend({
         } else {
             line += " # default: " + attr.get("default");
         }
+        line += "\n";
         return line;
     }
 }
