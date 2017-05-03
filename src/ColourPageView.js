@@ -19,7 +19,6 @@ class ColourPageView extends Backbone.View.extend({
          <option value="_colour" >color</option>
          <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
     </select>
-    <button type="button" id="changePage">Change</button>
     <br />
     Once you're done, select <tt>finish &AMP; build muttrc</tt> from the list above.
 </p>
@@ -79,7 +78,7 @@ Foo Bar                                  Acme Widgets Ltd                       
         `),
 
     events: {
-        "click #changePage": "displayOptionPage",
+        "change #page": "displayOptionPage",
         "change .colourSelector": "updateColours"
     }
 }) {
@@ -108,6 +107,7 @@ Foo Bar                                  Acme Widgets Ltd                       
     updateCSS() {
         for (let sec of ScreenSections.models) {
             let nodes = this.$el.find("." + sec.get("id"));
+            nodes.removeAttr('style');
             nodes.css("color", sec.fg().get("css"));
             nodes.css("backgroundColor", sec.bg().get("css"));
         }

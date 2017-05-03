@@ -16,7 +16,6 @@ class OptionPageView extends Backbone.View.extend({
          <option value="_colour" >color</option>
          <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
     </select>
-    <button type="button" id="changePage">Change</button>
     <br />
     Once you're done, select <tt>finish &AMP; build muttrc</tt> from the list above.
 </p>
@@ -41,7 +40,7 @@ class OptionPageView extends Backbone.View.extend({
         `),
 
     events: {
-        "click #changePage": "displayOptionPage",
+        "change #page": "displayOptionPage",
         "change .option": "updateAttr"
     }
 }) {
