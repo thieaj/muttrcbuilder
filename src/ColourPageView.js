@@ -107,7 +107,7 @@ Foo Bar                                  Acme Widgets Ltd                       
     updateCSS() {
         for (let sec of ScreenSections.models) {
             let nodes = this.$el.find("." + sec.get("id"));
-            nodes.removeAttr('style');
+            nodes.removeAttr("style");
             nodes.css("color", sec.fg().get("css"));
             nodes.css("backgroundColor", sec.bg().get("css"));
         }
