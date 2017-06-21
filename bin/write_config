@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+# coding=utf-8
+
+import subprocess
+from json import dump
+from lxml import etree
+from re import match
+from sys import argv
+
+
+def fix_link(e):
+    e.tag = "a"
+    e.set(
+        "href",
+        "http://www.mutt.org/doc/manual/manual-6.html#" + e.get("linkend")
+    )
+    del e.attrib["linkend"]
+
+
+def set_tag(e, new):
+    e.tag = new
+
+
+def remove_node(e):
+    for node in e:
+        e.getparent().append(e)
+    e.getparent().remove(e)
+
+
+def fix_thead(e):
+    for node in ".//entry":
+        node.tag = "th"
+    remove_node(e)
+
+
+def fix_em(e):
+    new_tag = "strong" if e.attrib.pop("role", "") == "bold" else "em"
+    e.tag = new_tag
+
+TAG_MAP = {
+    "para": lambda e: set_tag(e, "p"),
+    "quote": lambda e: set_tag(e, "tt"),
+    "literal": lambda e: set_tag(e, "tt"),
+    "emphasis": fix_em,
+    "variablelist": lambda e: set_tag(e, "dl"),
+    "term": lambda e: set_tag(e, "dt"),
+    "listitem": lambda e: set_tag(e, "dd"),
+    "informaltable": lambda e: set_tag(e, "table"),
+    "row": lambda e: set_tag(e, "tr"),
+    "entry": lambda e: set_tag(e, "td"),
+    "itemizedlist": lambda e: set_tag(e, "ul"),
+    "listitem": lambda e: set_tag(e, "li"),
+    "screen": lambda e: set_tag(e, "pre"),
+    "literallayout": lambda e: e.getparent().remove(e),
+    "title": lambda e: e.getparent().remove(e),
+    "link": fix_link,
+    "tbody": remove_node,
+    "tgroup": remove_node,
+    "varlistentry": remove_node,
+}
+
+try:
+    manual_xml = argv[1]
+    manual_txt = argv[2]
+except IndexError:
+    print("usage: {} manual.xml manual.txt [output.json]".format(argv[0]))
+
+try:
+    output_json = argv[3]
+except IndexError:
+    output_json = None
+
+doc = etree.parse(
+    open(manual_xml, "r"),
+    parser=etree.XMLParser(resolve_entities=False)
+)
+version = doc.xpath("//releaseinfo")[0].text
+matches = match(r"version\s+(.*?)\s+", version)
+if not matches:
+    raise Exception("Cannot work out version in {}".format(version))
+version = matches.group(1)
+
+if not output_json:
+    output_json = "config-v{}.json".format(version)
+
+attrs = []
+
+section = doc.xpath("//sect1[@id='variables']")[0]
+for attr_section in section.xpath(".//sect2"):
+    blob = attr_section.xpath("./literallayout")[0]
+    etree.strip_tags(blob, "*")
+    blob = blob.text
+    blob_match = match(r"Type: (.+)\s+Default:(.*)", blob)
+    assert blob_match, blob
+    default = blob_match.group(2).strip()
+    default = default.replace("˜", "~").strip()
+    entry_id = attr_section.xpath("./title")[0].text
+
+    for node in attr_section.xpath(".//*"):
+        TAG_MAP[node.tag](node)
+
+    attr = {
+        "id": entry_id,
+        "default": default,
+        "type": blob_match.group(1).strip(),
+        "text": "".join(etree.tostring(e) for e in attr_section).strip()
+    }
+    attrs.append(attr)
+
+proc = subprocess.Popen(["lynx", "-dump", manual_txt], stdout=subprocess.PIPE)
+in_vars = 0
+prev = ""
+result = ""
+for line in proc.stdout:
+    if match(r"^\d+\. ", line):
+        in_vars = 0
+    if (match(r"^\d+\. Configuration [Vv]ariables", line) and not
+            match(r"\S", prev)):
+        in_vars = 1
+    elif in_vars:
+        test = match(r"^\d+\.\d+\. (.*)", line)
+        if test:
+            result += "#  " + test.group(1) + "\n"
+        else:
+            result += "#" + line
+    prev = line
+proc.wait()
+
+dump({
+    "attrs": attrs,
+    "id": version,
+    "text": result
+}, open(output_json, "w"), indent=3, sort_keys=True)

@@ -4,6 +4,8 @@ let Backbone = require("backbone");
 let FileSaver = require("file-saver");
 Backbone.$ = $;
 
+import ScreenSections from "./ScreenSections";
+
 class ChooseFormatView extends Backbone.View.extend({
     template: _.template(`
 <form>
@@ -75,6 +77,7 @@ class ChooseFormatView extends Backbone.View.extend({
                 lines.push(line);
             }
         }
+        lines = lines.concat(this.writeColours());
         this.writeFile(lines);
     }
 
@@ -83,6 +86,7 @@ class ChooseFormatView extends Backbone.View.extend({
         for (let attr of this.model.get("attrs").models) {
             lines.push(this.writeAttr(attr, true));
         }
+        lines = lines.concat(this.writeColours());
         this.writeFile(lines);
     }
 
@@ -105,6 +109,26 @@ class ChooseFormatView extends Backbone.View.extend({
         }
         line += "\n";
         return line;
+    }
+
+    writeColours() {
+        let anyColoursSet = false;
+        for (let ss of ScreenSections.models) {
+            if (ss.isSet()) {
+                anyColoursSet = true;
+                break;
+            }
+        }
+
+        if (!anyColoursSet) {
+            return [];
+        }
+
+        return ["\n"].concat(
+            ScreenSections.models.map(
+                ss => "color " + ss.get("id") + " " + ss.fg().get("id") + " " + ss.bg().get("id") + "\n"
+            )
+        )
     }
 }
 
