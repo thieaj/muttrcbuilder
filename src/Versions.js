@@ -71,7 +71,7 @@ class Version extends Backbone.Model {
     parse(resp, options) {
         let attrs = resp.attrs.map(e => {
             e.category = Categories.get(e.id);
-            e.category = e.category ? e.category.get("page") : "default";
+            e.category = (e.category ? e.category.get("page") : null) || "default";
             return new Attribute(e);
         });
         resp.attrs = new AttributeCollection();

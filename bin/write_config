@@ -5,7 +5,7 @@ import subprocess
 from json import dump
 from lxml import etree
 from re import match
-from sys import argv
+from sys import argv, exit
 
 
 def fix_link(e):
@@ -64,6 +64,8 @@ try:
     manual_txt = argv[2]
 except IndexError:
     print("usage: {} manual.xml manual.txt [output.json]".format(argv[0]))
+    exit(1)
+    
 
 try:
     output_json = argv[3]
@@ -125,6 +127,7 @@ for line in proc.stdout:
             result += "#" + line
     prev = line
 proc.wait()
+result += "#  END\n"
 
 dump({
     "attrs": attrs,

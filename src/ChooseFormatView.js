@@ -51,7 +51,8 @@ class ChooseFormatView extends Backbone.View.extend({
     formatSelected() {
         let handler = {
             minimal: () => this.saveBasicFormat(),
-            all: () => this.saveFullFormat()
+            all: () => this.saveFullFormat(),
+            full: () => this.saveManualFormat()
         }[$("input[name='format']:checked").val()];
         handler();
     }
@@ -128,7 +129,43 @@ class ChooseFormatView extends Backbone.View.extend({
             ScreenSections.models.map(
                 ss => "color " + ss.get("id") + " " + ss.fg().get("id") + " " + ss.bg().get("id") + "\n"
             )
-        )
+        );
+    }
+
+    saveManualFormat() {
+        let seen = {};
+        let lines = this.getFileHeader();
+        let currentCommand = null;
+
+        for(let line of this.model.get("text").split("\n")) {
+            if (/^#  [A-Za-z]/.test(line)) {
+                if (currentCommand) {
+                    seen[currentCommand] = true;
+                    lines.push(this.writeAttr(this.model.get("attrs").get(currentCommand), true));
+                    lines.push("#\n")
+                    lines.push("##########\n")
+                }
+                currentCommand = line.substring(3);
+            }
+            if (line != "#  END") {
+                lines.push(line + "\n");
+            }
+        }
+
+        let first = true;
+        for (let attr of this.model.get("attrs").models) {
+            if (!seen[attr.get("id")]) {
+                if (first) {
+                    first = false;
+                    lines.push("\n");
+                    lines.push("# Other variables");
+                    lines.push("\n");
+                }
+                lines.push(this.writeAttr(attr, true));
+            }
+        }
+
+        this.writeFile(lines);
     }
 }
 

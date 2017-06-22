@@ -1,7 +1,3 @@
 - category view
-- full manual view
-- perl builder thing
-- "null" section
-- readme
 - fix sadness with footer
 - make header/footer utilities shared between views

@@ -13,9 +13,8 @@ To build run `make` then view the `html/index.html` file in your web browser.
 Requires `nodejs` and `npm`. The `Makefile` assumed a Unix-style environment
 with tools such as `touch` in the path.
 
-The program to generate new configuration JSON requires `perl` and the perl
-modules `JSON`, `XML::LibXML` and `XML::LibXSLT`. IT also requires a `lynx`
-program in the `$PATH`.
+The program to generate new configuration JSON requires `python` and the
+module `lxml`.  It also requires a `lynx` program in the `$PATH`.
 
 == Copyright and licence
 

@@ -4,7 +4,6 @@ Backbone.$ = require("jquery");
 import Categories from "./Categories";
 import ChooseFormatView from "./ChooseFormatView";
 import ColourPageView from "./ColourPageView";
-import Colours from "./Colours";
 import OptionPageView from "./OptionPageView";
 import Versions from "./Versions";
 import VersionView from "./VersionView";
