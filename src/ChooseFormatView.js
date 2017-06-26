@@ -50,9 +50,10 @@ class ChooseFormatView extends Backbone.View.extend({
 
     formatSelected() {
         let handler = {
-            minimal: () => this.saveBasicFormat(),
             all: () => this.saveFullFormat(),
-            full: () => this.saveManualFormat()
+            categories: () => this.saveCategoryFormat(),
+            full: () => this.saveManualFormat(),
+            minimal: () => this.saveBasicFormat()
         }[$("input[name='format']:checked").val()];
         handler();
     }
@@ -113,6 +114,13 @@ class ChooseFormatView extends Backbone.View.extend({
     }
 
     writeColours() {
+        const padTo = (val, size) => {
+            while (val.length < size) {
+                val += " ";
+            }
+            return val;
+        };
+
         let anyColoursSet = false;
         for (let ss of ScreenSections.models) {
             if (ss.isSet()) {
@@ -127,7 +135,7 @@ class ChooseFormatView extends Backbone.View.extend({
 
         return ["\n"].concat(
             ScreenSections.models.map(
-                ss => "color " + ss.get("id") + " " + ss.fg().get("id") + " " + ss.bg().get("id") + "\n"
+                ss => "color " + padTo(ss.get("id"), 12) + " " + padTo(ss.fg().get("id"), 10) + " " + ss.bg().get("id") + "\n"
             )
         );
     }
@@ -142,8 +150,8 @@ class ChooseFormatView extends Backbone.View.extend({
                 if (currentCommand) {
                     seen[currentCommand] = true;
                     lines.push(this.writeAttr(this.model.get("attrs").get(currentCommand), true));
-                    lines.push("#\n")
-                    lines.push("##########\n")
+                    lines.push("#\n");
+                    lines.push("##########\n");
                 }
                 currentCommand = line.substring(3);
             }
@@ -165,6 +173,33 @@ class ChooseFormatView extends Backbone.View.extend({
             }
         }
 
+        lines = lines.concat(this.writeColours());
+        this.writeFile(lines);
+    }
+
+    saveCategoryFormat() {
+        let lines = this.getFileHeader();
+        let byCategory = {};
+        for (let attr of this.model.get("attrs").models) {
+            let cat = attr.get("category") || "default";
+            if(!byCategory[cat]) {
+                byCategory[cat] = [];
+            }
+            byCategory[cat].push(attr);
+        }
+
+        for(let cat of Object.keys(byCategory).sort()) {
+            lines.push("##########\n");
+            lines.push("# Category " + cat + "\n");
+            lines.push("##########\n");
+            lines.push("\n");
+            for(let attr of byCategory[cat]) {
+                lines.push(this.writeAttr(attr, true));
+            }
+            lines.push("\n");
+        }
+
+        lines = lines.concat(this.writeColours());
         this.writeFile(lines);
     }
 }
