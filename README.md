@@ -1,14 +1,14 @@
-= muttrcbuilder version 2.0
+# muttrcbuilder version 2.0
 
 This is the code used to run <http://www.muttrcbuilder.org/>. It provides an
 easy way to create `muttrc` files for the mutt email client
 (<http://www.mutt.org/>).
 
-== Installation
+## Installation
 
 To build run `make` then view the `html/index.html` file in your web browser.
 
-== Dependencies
+## Dependencies
 
 Requires `nodejs` and `npm`. The `Makefile` assumed a Unix-style environment
 with tools such as `touch` in the path.
@@ -16,7 +16,7 @@ with tools such as `touch` in the path.
 The program to generate new configuration JSON requires `python` and the
 module `lxml`.  It also requires a `lynx` program in the `$PATH`.
 
-== Copyright and licence
+## Copyright and licence
 
 Copyright (C) 2005-2017 by Luke Ross
 
