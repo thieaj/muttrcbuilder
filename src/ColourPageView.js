@@ -4,24 +4,14 @@ let Backbone = require("backbone");
 Backbone.$ = $;
 
 import Colours from "./Colours";
+import PageDropdownInnerView from "./PageDropdownInnerView";
 import ScreenSections from "./ScreenSections";
 
 class ColourPageView extends Backbone.View.extend({
     template: _.template(`
 <hr />
 <form>
-<p>
-    <strong>Change page:</strong>
-    <select name="page" id="page">
-        <% for (let _page of version.pages()) { %>
-         <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
-    <% } %>
-         <option value="_colour" >color</option>
-         <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
-    </select>
-    <br />
-    Once you're done, select <tt>finish &AMP; build muttrc</tt> from the list above.
-</p>
+<div id="change-page-holder"></div>
 <pre class="normal mockScreen" width="80">
 <span class="status">i:Exit  -:PrevPg  <Space>:NextPg v:View Attachm.  d:Del  r:Reply  j:Next ?:Help        </span>
 
@@ -115,6 +105,8 @@ Foo Bar                                  Acme Widgets Ltd                       
 
     render(page) {
         this.$el.html(this.template({version: this.model, page: page, sections: ScreenSections, colours: Colours}));
+        let pageChanger = new PageDropdownInnerView({model: this.model, el: this.$el.find("#change-page-holder")});
+        pageChanger.render("_colour")
         this.updateCSS();
         return this.$el;
     }

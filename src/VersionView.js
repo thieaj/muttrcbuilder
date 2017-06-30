@@ -15,6 +15,11 @@ class VersionView extends Backbone.View.extend({
     The idea is based on netliberte's sadly-defunct muttrc builder.
 </p>
 
+<p>
+     This service is provided in the hope that you'll find it useful,
+     but no warranty is offered.
+</p>
+
 <h2>Ready? Let's Begin</h2>
 <p>
     To start, please select which version of mutt you want to generate
@@ -32,12 +37,6 @@ class VersionView extends Backbone.View.extend({
          <button id="chooseVersion" type="button">Next</button>
     </p>
 
-    <hr />
-
-    <p>
-         This service is provided in the hope that you'll find it useful,
-         but no warranty is offered.
-    </p>
 </form>
         `),
 

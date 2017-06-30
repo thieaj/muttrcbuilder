@@ -3,22 +3,13 @@ let $ = require("jquery");
 let Backbone = require("backbone");
 Backbone.$ = $;
 
+import PageDropdownInnerView from "./PageDropdownInnerView";
+
 class OptionPageView extends Backbone.View.extend({
     template: _.template(`
 <hr />
 <form>
-<p>
-    <strong>Change page:</strong>
-    <select name="page" id="page">
-        <% for (let _page of version.pages()) { %>
-         <option<% if (_page == page) { %> selected="selected"<% } %>><%= _page %></option>
-    <% } %>
-         <option value="_colour" >color</option>
-         <option value="_finish">FINISH &amp; BUILD MUTTRC</option>
-    </select>
-    <br />
-    Once you're done, select <tt>finish &AMP; build muttrc</tt> from the list above.
-</p>
+<div id="change-page-holder"></div>
     <% for (let option of options) { %>
         <hr />
         <h3><%= option.get("id") %></h3>
@@ -63,6 +54,8 @@ class OptionPageView extends Backbone.View.extend({
 
     render(page) {
         this.$el.html(this.template({version: this.model, page: page, options: this.model.get("attrs").where({"category": page})}));
+        let pageChanger = new PageDropdownInnerView({model: this.model, el: this.$el.find("#change-page-holder")});
+        pageChanger.render(page)
         return this.$el;
     }
 
