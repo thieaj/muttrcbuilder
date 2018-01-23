@@ -106,7 +106,7 @@ Foo Bar                                  Acme Widgets Ltd                       
     render(page) {
         this.$el.html(this.template({version: this.model, page: page, sections: ScreenSections, colours: Colours}));
         let pageChanger = new PageDropdownInnerView({model: this.model, el: this.$el.find("#change-page-holder")});
-        pageChanger.render("_colour")
+        pageChanger.render("_colour");
         this.updateCSS();
         return this.$el;
     }
