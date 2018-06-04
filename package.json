@@ -2,12 +2,18 @@
   "name": "muttrcbuilder",
   "description": "Muttrc Builder",
   "url": "https://muttrcbuilder.org/",
+  "bugs": {
+    "url": "https://github.com/lukeross/muttrcbuilder/issues"
+  },
+  "repository": {
+    "url": "https://github.com/lukeross/MuttrcBuilder.git"
+  },
   "author": {
     "name": "Luke Ross",
     "email": "lr@lukeross.name"
   },
   "main": "muttrcbuilder.js",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "license": "GPL-2.0",
   "readmeFilename": "README.md",
   "dependencies": {
@@ -21,6 +27,8 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "deploy": "gh-pages -d html"
+    "build": "browserify -t rollupify -r ./src/Builder.js:muttrcbuilder -o html/muttrcbuilder.js",
+    "deploy": "gh-pages -d html",
+    "start": "(cd html; python -m SimpleHTTPServer 5000)"
   }
 }

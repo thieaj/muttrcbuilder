@@ -1,4 +1,4 @@
-# muttrcbuilder version 2.0
+# muttrcbuilder version 2.2
 
 This is the code used to run <http://www.muttrcbuilder.org/>. It provides an
 easy way to create `muttrc` files for the mutt email client
@@ -6,12 +6,12 @@ easy way to create `muttrc` files for the mutt email client
 
 ## Installation
 
-To build run `make` then view the `html/index.html` file in your web browser.
+To build run `npm install`, `npm run build` and `npm start`, then view
+`http://localhost:5000/` in your web browser.
 
 ## Dependencies
 
-Requires `nodejs` and `npm`. The `Makefile` assumed a Unix-style environment
-with tools such as `touch` in the path.
+Requires `nodejs` and `npm`, and `python` to run the test server.
 
 The program to generate new configuration JSON requires `python` and the
 module `lxml`.  It also requires a `lynx` program in the `$PATH`.
