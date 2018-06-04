@@ -18,7 +18,7 @@ module `lxml`.  It also requires a `lynx` program in the `$PATH`.
 
 ## Copyright and licence
 
-Copyright (C) 2005-2017 by Luke Ross
+Copyright (C) 2005-2018 by Luke Ross
 
 The included mutt documentation is extracted directly from the mutt
 distributions and is:
@@ -27,11 +27,11 @@ distributions and is:
     Copyright (C) 1996-2002 Brandon Long <blong@fiction.net>
     Copyright (C) 1997-2009 Thomas Roessler <roessler@does-not-exist.org>
     Copyright (C) 1998-2005 Werner Koch <wk@isil.d.shuttle.de>
-    Copyright (C) 1999-2014 Brendan Cully <brendan@kublai.com>
+    Copyright (C) 1999-2017 Brendan Cully <brendan@kublai.com>
     Copyright (C) 1999-2002 Tommi Komulainen <Tommi.Komulainen@iki.fi>
     Copyright (C) 2000-2004 Edmund Grimley Evans <edmundo@rano.org>
     Copyright (C) 2006-2009 Rocco Rutte <pdmef@gmx.net>
-    Copyright (C) 2014-2016 Kevin J. McCarthy <kevin@8t8.us>
+    Copyright (C) 2014-2017 Kevin J. McCarthy <kevin@8t8.us>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
