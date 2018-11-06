@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 import subprocess
@@ -105,7 +105,9 @@ for attr_section in section.xpath(".//sect2"):
         "id": entry_id,
         "default": default,
         "type": blob_match.group(1).strip(),
-        "text": "".join(etree.tostring(e) for e in attr_section).strip()
+        "text": "".join(
+            etree.tostring(e).decode("utf-8") for e in attr_section
+        ).strip()
     }
     attrs.append(attr)
 
@@ -114,6 +116,7 @@ in_vars = 0
 prev = ""
 result = ""
 for line in proc.stdout:
+    line = line.decode("utf-8")
     if match(r"^\d+\. ", line):
         in_vars = 0
     if (match(r"^\d+\. Configuration [Vv]ariables", line) and not
