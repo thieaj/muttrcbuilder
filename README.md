@@ -4,6 +4,9 @@ This is the code used to run <http://www.muttrcbuilder.org/>. It provides an
 easy way to create `muttrc` files for the mutt email client
 (<http://www.mutt.org/>).
 
+**This software (and associated web site) is looking for a new maintainer.
+Please email me if you would be interested in doing so.**
+
 ## Installation
 
 To build run `npm install`, `npm run build` and `npm start`, then view
@@ -18,7 +21,7 @@ module `lxml`.  It also requires a `lynx` program in the `$PATH`.
 
 ## Copyright and licence
 
-Copyright (C) 2005-2018 by Luke Ross
+Copyright (C) 2005-2019 by Luke Ross
 
 The included mutt documentation is extracted directly from the mutt
 distributions and is:
@@ -31,7 +34,7 @@ distributions and is:
     Copyright (C) 1999-2002 Tommi Komulainen <Tommi.Komulainen@iki.fi>
     Copyright (C) 2000-2004 Edmund Grimley Evans <edmundo@rano.org>
     Copyright (C) 2006-2009 Rocco Rutte <pdmef@gmx.net>
-    Copyright (C) 2014-2017 Kevin J. McCarthy <kevin@8t8.us>
+    Copyright (C) 2014-2019 Kevin J. McCarthy <kevin@8t8.us>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

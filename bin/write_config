@@ -37,6 +37,7 @@ def fix_em(e):
     new_tag = "strong" if e.attrib.pop("role", "") == "bold" else "em"
     e.tag = new_tag
 
+
 TAG_MAP = {
     "para": lambda e: set_tag(e, "p"),
     "quote": lambda e: set_tag(e, "tt"),
@@ -44,7 +45,6 @@ TAG_MAP = {
     "emphasis": fix_em,
     "variablelist": lambda e: set_tag(e, "dl"),
     "term": lambda e: set_tag(e, "dt"),
-    "listitem": lambda e: set_tag(e, "dd"),
     "informaltable": lambda e: set_tag(e, "table"),
     "row": lambda e: set_tag(e, "tr"),
     "entry": lambda e: set_tag(e, "td"),
@@ -65,7 +65,7 @@ try:
 except IndexError:
     print("usage: {} manual.xml manual.txt [output.json]".format(argv[0]))
     exit(1)
-    
+
 
 try:
     output_json = argv[3]
