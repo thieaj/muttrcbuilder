@@ -1,7 +1,7 @@
 {
   "name": "muttrcbuilder",
   "description": "Muttrc Builder",
-  "url": "https://muttrcbuilder.org/",
+  "url": "https://lukeross.github.io/MuttrcBuilder/",
   "bugs": {
     "url": "https://github.com/lukeross/muttrcbuilder/issues"
   },
