@@ -9,7 +9,7 @@ class VersionView extends Backbone.View.extend({
     This site lets you create a <tt>muttrc</tt> configuration file for
     the <a href="http://www.mutt.org/">Mutt email program</a>. You
     specify your preferences in the boxes on the next few pages, and
-    you get a muttrc you can use.
+    you get a muttrc configuration file you can use.
 </p>
 <p>
     The idea is based on netliberte's sadly-defunct muttrc builder.
