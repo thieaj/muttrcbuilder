@@ -1,4 +1,5 @@
 {
+   "abort_noattach" : "composing", "sending",
    "abort_nosubject" : "composing",
    "abort_unmodified" : "composing",
    "alias_file" : "essential",
