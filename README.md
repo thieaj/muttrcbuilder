@@ -1,11 +1,21 @@
-# muttrcbuilder version 2.3
+# muttrcbuilder version 2.3.0
+---
 
+## What is this!?
+
+I am a recent `mutt` convert, but not a noob to the command line. After 
+scorlling, reading the `mutt` 
+[wiki/ConfigList](https://gitlab.com/muttmua/mutt/-/wikis/ConfigList), I 
+found a refrence to `muttrcbuilder` by Luke Ross. I reached out to Mr. Ross 
+to ask about the state of the project. Mr. Ross was kind enough to preovide 
+a repo, which I have cloned here, and am attempting  development of.
+
+
+
+---
 This is the code used to run <https://lukeross.github.io/MuttrcBuilder/>. It
 provides an easy way to create `muttrc` files for the mutt email client
 (<http://www.mutt.org/>).
-
-**This software (and associated web site) is looking for a new maintainer.
-Please email me if you would be interested in doing so.**
 
 ## Installation
 
