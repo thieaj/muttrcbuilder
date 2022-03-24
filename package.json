@@ -9,8 +9,8 @@
 	"url": "https://github.com/lukeross/MuttrcBuilder.git"
   },
   "author": {
-	"name": "Luke Ross",
-	"email": "lr@lukeross.name"
+    "name": "AJ Thiesen",
+    "email": "aj@codetaco.xyz"
   },
   "main": "muttrcbuilder.js",
   "version": "2.3.0",
@@ -29,6 +29,6 @@
   "scripts": {
     "build": "browserify -t rollupify -r ./src/Builder.js:muttrcbuilder -o html/muttrcbuilder.js",
     "deploy": "gh-pages -d html",
-    "start": "(cd html; python -m SimpleHTTPServer 5000)"
+    "start": "(cd html; python3 -m SimpleHTTPServer 5000)"
   }
 }
