@@ -1,16 +1,16 @@
 {
-  "name": "muttrcbuilder",
-  "description": "Muttrc Builder",
+  "name": "muttrcbuilder2",
+  "description": "Muttrc Builder2",
   "url": "https://lukeross.github.io/MuttrcBuilder/",
   "bugs": {
-    "url": "https://github.com/lukeross/muttrcbuilder/issues"
+	"url": "https://github.com/lukeross/muttrcbuilder/issues"
   },
   "repository": {
-    "url": "https://github.com/lukeross/MuttrcBuilder.git"
+	"url": "https://github.com/lukeross/MuttrcBuilder.git"
   },
   "author": {
-    "name": "Luke Ross",
-    "email": "lr@lukeross.name"
+	"name": "Luke Ross",
+	"email": "lr@lukeross.name"
   },
   "main": "muttrcbuilder.js",
   "version": "2.3.0",

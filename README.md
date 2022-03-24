@@ -1,14 +1,12 @@
-# muttrcbuilder version 2.3.0
+# muttrcbuilder2 version 2.3.0
 ---
 
 ## What is this!?
 
-I am a recent `mutt` convert, but **not** a noob to the command line. After 
-scrolling through, and reading the `mutt` 
-[wiki/ConfigList](https://gitlab.com/muttmua/mutt/-/wikis/ConfigList), I 
-found a reference to `muttrcbuilder` by Luke Ross. I reached out to Mr. Ross 
-to ask about the state of the project. Mr. Ross was kind enough to provide me with 
-a repo, which I have cloned here, and am attempting development of.
+I am a recent `mutt` convert, but **not** a noob to the command line. After scrolling through, and reading the `mutt`
+[wiki/ConfigList](https://gitlab.com/muttmua/mutt/-/wikis/ConfigList), I found a reference to `muttrcbuilder` by Luke
+Ross. I reached out to Mr. Ross to ask about the state of the project. Mr. Ross was kind enough to provide me with a
+repo, which I have cloned here, and I am attempting development of.
 
 This project is definitely a work in progress! You should assume things are not working.
 
