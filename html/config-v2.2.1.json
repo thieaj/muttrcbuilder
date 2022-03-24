@@ -1,15 +1,21 @@
 {
    "attrs" : [
       {
-         "default" : "(empty)",
-         "id" : "smime_get_cert_email_command",
-         "text" : "\n\n\n\n<p>\nThis command is used to extract the mail address(es) used for storing\nX509 certificates, and for verification purposes (to check whether the\ncertificate was issued for the sender's mailbox).\n</p>\n<p>\nThis is a format string, see the <a href=\"http://www.mutt.org/doc/manual/manual-6.html#smime-decrypt-command\">$smime_decrypt_command</a> command for\npossible printf(3)-like sequences.\n(S/MIME only)\n</p>\n",
-         "type" : "string"
+         "default": "no",
+         "id": "abort_noattach",
+         "text": "When the body of the message matches `$abort_noattach_regexp` and there are no attachments, this  controls whether to abort sending the message.\n",
+         "type": "quadoption"
       },
       {
-         "default" : "(empty)",
-         "id" : "smtp_pass",
-         "text" : "\n\n\n\n<p>\nSpecifies the password for your SMTP account.  If <em>unset</em>, Mutt will\nprompt you for your password when you first send mail via SMTP.\nSee <a href=\"http://www.mutt.org/doc/manual/manual-6.html#smtp-url\">$smtp_url</a> to configure mutt to send mail via SMTP.\n</p>\n<p>\n<em>Warning</em>: you should only use this option when you are on a\nfairly secure machine, because the superuser can read your muttrc even\nif you are the only one who can read the file.\n</p>\n",
+         "default": "(empty)",
+         "id": "smime_get_cert_email_command",
+         "text": "\n\n\n\n<p>\nThis command is used to extract the mail address(es) used for storing\nX509 certificates, and for verification purposes (to check whether the\ncertificate was issued for the sender's mailbox).\n</p>\n<p>\nThis is a format string, see the <a href=\"http://www.mutt.org/doc/manual/manual-6.html#smime-decrypt-command\">$smime_decrypt_command</a> command for\npossible printf(3)-like sequences.\n(S/MIME only)\n</p>\n",
+         "type": "string"
+      },
+      {
+         "default": "(empty)",
+         "id": "smtp_pass",
+         "text": "\n\n\n\n<p>\nSpecifies the password for your SMTP account.  If <em>unset</em>, Mutt will\nprompt you for your password when you first send mail via SMTP.\nSee <a href=\"http://www.mutt.org/doc/manual/manual-6.html#smtp-url\">$smtp_url</a> to configure mutt to send mail via SMTP.\n</p>\n<p>\n<em>Warning</em>: you should only use this option when you are on a\nfairly secure machine, because the superuser can read your muttrc even\nif you are the only one who can read the file.\n</p>\n",
          "type" : "string"
       },
       {
