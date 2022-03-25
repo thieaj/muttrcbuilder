@@ -11,8 +11,8 @@ repo, which I have cloned here, and I am attempting development of.
 This project is definitely a work in progress! You should assume things are not working.
 
 ---
-This is the code used to run <https://0xtaj.github.io/muttrcbuilder2/>. It provides an easy way to create `muttrc` files
-for the mutt email client
+This is the code used to run <https://0xtaj.github.io/muttrcbuilder2/>. It provides an easier way to create a `muttrc` file
+for the mutt email client.
 (<http://www.mutt.org/>).
 
 ## Installation

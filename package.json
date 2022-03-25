@@ -1,9 +1,9 @@
 {
   "name": "muttrcbuilder2",
   "description": "Muttrc Builder2",
-  "url": "https://lukeross.github.io/MuttrcBuilder/",
+  "url": "https://github.com/0xtaj/muttrcbuilder2",
   "bugs": {
-	"url": "https://github.com/lukeross/muttrcbuilder/issues"
+	"url": "https://github.com/0xtaj/muttrcbuilder2/issues"
   },
   "repository": {
 	"url": "https://github.com/lukeross/MuttrcBuilder.git"
@@ -29,6 +29,6 @@
   "scripts": {
     "build": "browserify -t rollupify -r ./src/Builder.js:muttrcbuilder -o html/muttrcbuilder.js",
     "deploy": "gh-pages -d html",
-    "start": "(cd html; python3 -m SimpleHTTPServer 5000)"
+    "start": "(cd html; python3 -m http.server 5432)"
   }
 }
