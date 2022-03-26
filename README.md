@@ -11,14 +11,14 @@ repo, which I have cloned here, and I am attempting development of.
 This project is definitely a work in progress! You should assume things are not working.
 
 ---
-This is the code used to run <https://0xtaj.github.io/muttrcbuilder2/>. It provides an easier way to create a `muttrc` file
+This is the code used to run <https://0xtaj.github.io/muttrcbuilder/>. It provides an easier way to create a `muttrc` file
 for the mutt email client.
 (<http://www.mutt.org/>).
 
 ## Installation
 
 To build run `npm install`, `npm run build` and `npm start`, then view
-`http://localhost:5000/` in your web browser.
+`http://localhost:9000/` in your web browser.
 
 ## Dependencies
 
