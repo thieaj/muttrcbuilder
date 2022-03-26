@@ -1,4 +1,4 @@
-# muttrcbuilder2 version 2.3.0
+# muttrcbuilder - version 2.3.0
 ---
 
 ## What is this!?
