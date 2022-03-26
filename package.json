@@ -29,6 +29,6 @@
   "scripts": {
     "build": "browserify -t rollupify -r ./src/Builder.js:muttrcbuilder -o html/muttrcbuilder.js",
     "deploy": "gh-pages -d html",
-    "start": "(cd html; python3 -m http.server 5432)"
+    "start": "(cd html; python3 -m http.server 9000)"
   }
 }
